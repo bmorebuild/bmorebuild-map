@@ -1,0 +1,19 @@
+# --- Python environment ---
+.venv/
+__pycache__/
+*.pyc
+
+# --- Local data (large or private) ---
+data_local/
+*.gpkg
+*.shp
+*.dbf
+*.shx
+*.zip
+*.geojson
+!data/projects_points.geojson
+!data/projects_parcels.geojson
+
+# --- System/editor ---
+.DS_Store
+Thumbs.db
