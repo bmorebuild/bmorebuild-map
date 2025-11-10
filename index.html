@@ -103,61 +103,39 @@
       attribution: '&copy; OpenStreetMap contributors'
     }).addTo(map);
 
-    // Parcels
-    setStatus('Loading parcels…');
-    fetch('data/projects_parcels.geojson')
-      .then(r => r.ok ? r.json() : Promise.reject(r.status))
-      .then(geo => {
-        const parcels = L.geoJSON(geo, {
-          style: {
-            color: '#A34D2E',
-            weight: 2,
-            fillOpacity: 0.2
-          }
-        }).addTo(map);
-        try {
-          const b = parcels.getBounds();
-          if (b.isValid()) map.fitBounds(b, { padding: [20, 20] });
-        } catch {}
-        setStatus('Loading projects…');
-      })
-      .catch(e => setStatus('Error loading parcels: ' + e));
+    // Project Parcels
+    setStatus('Loading project sites…');
+  fetch('data/projects_polys.geojson')
+    .then(r => r.ok ? r.json() : Promise.reject(r.status))
+    .then(geo => {
+      const projects = L.geoJSON(geo, {
+        style: {
+          color: '#A34D2E',    // brick color
+          weight: 2.5,
+          fillOpacity: 0.35
+        },
+        onEachFeature: (feature, layer) => {
+          const p = feature.properties || {};
+          const name = p.project_name || 'Unnamed Project';
+          const id = p.project_id || '';
+          const html = `
+            <div style="min-width:220px">
+              <strong>${name}</strong><br/>
+              ${id ? `<span style="font-size:12px; color:#555;">ID: ${id}</span>` : ''}
+            </div>`;
+          layer.bindPopup(html);
+        }
+      }).addTo(map);
 
-    // Points
-    fetch('data/projects_points.geojson')
-      .then(r => r.ok ? r.json() : Promise.reject(r.status))
-      .then(geo => {
-        L.geoJSON(geo, {
-          pointToLayer: (feature, latlng) => L.circleMarker(latlng, {
-            radius: 4,
-            color: varColor(),
-            weight: 2,
-            fillOpacity: 0.85
-          }),
-          onEachFeature: (feature, layer) => {
-            const p = feature.properties || {};
-            const pin  = p.PIN || p.parcel_id || '';
-            const addr = p.display_address || '';
-            const sdat = p.sdat_url || '';
-            const html = `
-              <div style="min-width:220px">
-                <strong>${addr || pin}</strong><br/>
-                ${pin ? `Parcel ID: ${pin}<br/>` : ''}
-                ${sdat ? `<a href="${sdat}" target="_blank" rel="noopener noreferrer">View SDAT</a>` : ''}
-              </div>`;
-            layer.bindPopup(html);
-          }
-        }).addTo(map);
-        setStatus('Loaded');
-        setTimeout(() => { if (statusEl) statusEl.style.display = 'none'; }, 2000);
-      })
-      .catch(e => setStatus('Error loading points: ' + e));
+      try {
+        const bounds = projects.getBounds();
+        if (bounds.isValid()) map.fitBounds(bounds, { padding: [20, 20] });
+      } catch {}
 
-    function varColor() {
-      return getComputedStyle(document.documentElement)
-        .getPropertyValue('--bmore-brick')
-        .trim() || '#A34D2E';
-    }
+      setStatus('Loaded');
+      setTimeout(() => { statusEl.style.display = 'none'; }, 2000);
+    })
+    .catch(e => setStatus('Error loading projects: ' + e));
   </script>
 </body>
 </html>
