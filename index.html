@@ -110,9 +110,9 @@
       .then(geo => {
         const parcels = L.geoJSON(geo, {
           style: {
-            color: '#1D5E8A',
-            weight: 1.5,
-            fillOpacity: 0.05
+            color: '#A34D2E',
+            weight: 2,
+            fillOpacity: 0.2
           }
         }).addTo(map);
         try {
@@ -129,7 +129,7 @@
       .then(geo => {
         L.geoJSON(geo, {
           pointToLayer: (feature, latlng) => L.circleMarker(latlng, {
-            radius: 6,
+            radius: 4,
             color: varColor(),
             weight: 2,
             fillOpacity: 0.85
