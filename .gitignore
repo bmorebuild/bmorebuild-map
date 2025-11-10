@@ -11,7 +11,7 @@ data_local/
 *.shx
 *.zip
 *.geojson
-!data/projects_points.geojson
+!data/projects_polys.geojson
 !data/projects_parcels.geojson
 
 # --- System/editor ---
