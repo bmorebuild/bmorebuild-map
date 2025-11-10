@@ -4,42 +4,102 @@
   <meta charset="utf-8" />
   <title>BmoreBuild — Active Projects</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link
-    rel="stylesheet"
-    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-  />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <style>
-    html, body, #map {
+    :root {
+      --bmore-brick: #A34D2E;
+      --bmore-sand: #F4E9D8;
+    }
+    html, body {
       height: 100%;
       margin: 0;
-      padding: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: var(--bmore-sand);
+    }
+    body {
+      display: flex;
+      flex-direction: column;
+    }
+    header {
+      flex: 0 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.4rem 0.9rem;
+      background: #fff;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+    }
+    header .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+    header img.logo {
+      height: 44px;
+      width: auto;
+      display: block;
+    }
+    header .title-text {
+      display: flex;
+      flex-direction: column;
+      line-height: 1.1;
+    }
+    header .title-text span.name {
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      font-size: 0.9rem;
+      color: var(--bmore-brick);
+    }
+    header .title-text span.tagline {
+      font-size: 0.75rem;
+      color: #555;
+    }
+    #map {
+      flex: 1 1 auto;
+      height: auto;
+      min-height: 0;
     }
     #status {
       position: absolute;
-      top: 8px;
-      left: 8px;
+      top: 64px;
+      left: 10px;
       z-index: 1000;
-      background: rgba(255,255,255,0.9);
+      background: rgba(255,255,255,0.95);
       padding: 6px 10px;
       border-radius: 6px;
-      font-family: system-ui, sans-serif;
-      font-size: 13px;
+      font-size: 12px;
       box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+    }
+    @media (max-width: 600px) {
+      header .title-text span.tagline {
+        display: none;
+      }
+      header img.logo {
+        height: 36px;
+      }
     }
   </style>
 </head>
 <body>
+  <header>
+    <div class="brand">
+      <img src="img/bmorebuild_logo.png" alt="BmoreBuild logo" class="logo" />
+      <div class="title-text">
+        <span class="name">BmoreBuild</span>
+        <span class="tagline">Tracking Baltimore’s changing streetscape</span>
+      </div>
+    </div>
+  </header>
+
   <div id="status">Loading map…</div>
   <div id="map"></div>
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script>
     const statusEl = document.getElementById('status');
-    function setStatus(msg) {
-      if (statusEl) statusEl.textContent = msg;
-    }
+    const setStatus = msg => { if (statusEl) statusEl.textContent = msg; };
 
-    // 1) basic map
     const map = L.map('map').setView([39.2904, -76.6122], 12);
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -47,79 +107,61 @@
       attribution: '&copy; OpenStreetMap contributors'
     }).addTo(map);
 
-    // 2) load parcels
+    // Parcels
     setStatus('Loading parcels…');
-
     fetch('data/projects_parcels.geojson')
-      .then(res => {
-        if (!res.ok) throw new Error('Parcels HTTP ' + res.status);
-        return res.json();
-      })
+      .then(r => r.ok ? r.json() : Promise.reject(r.status))
       .then(geo => {
-        const parcelsLayer = L.geoJSON(geo, {
+        const parcels = L.geoJSON(geo, {
           style: {
             color: '#1D5E8A',
             weight: 1.5,
-            fillOpacity: 0.35
+            fillOpacity: 0.05
           }
         }).addTo(map);
-
-        // zoom to all parcels if present
         try {
-          const b = parcelsLayer.getBounds();
-          if (b.isValid()) map.fitBounds(b, { padding: [20,20] });
-        } catch (e) {
-          console.warn('Could not fit bounds:', e);
-        }
-
+          const b = parcels.getBounds();
+          if (b.isValid()) map.fitBounds(b, { padding: [20, 20] });
+        } catch {}
         setStatus('Loading projects…');
       })
-      .catch(err => {
-        console.error('Error loading parcels:', err);
-        setStatus('Error loading parcels: ' + err.message);
-      });
+      .catch(e => setStatus('Error loading parcels: ' + e));
 
-    // 3) load points
+    // Points
     fetch('data/projects_points.geojson')
-      .then(res => {
-        if (!res.ok) throw new Error('Points HTTP ' + res.status);
-        return res.json();
-      })
+      .then(r => r.ok ? r.json() : Promise.reject(r.status))
       .then(geo => {
         L.geoJSON(geo, {
-          pointToLayer: (feature, latlng) =>
-            L.circleMarker(latlng, {
-              radius: 6,
-              color: '#0B6E4F',
-              weight: 2,
-              fillOpacity: 0.70
-            }),
+          pointToLayer: (feature, latlng) => L.circleMarker(latlng, {
+            radius: 6,
+            color: varColor(),
+            weight: 2,
+            fillOpacity: 0.85
+          }),
           onEachFeature: (feature, layer) => {
             const p = feature.properties || {};
-            const pin = p.PIN || p.parcel_id || '';
+            const pin  = p.PIN || p.parcel_id || '';
             const addr = p.display_address || '';
             const sdat = p.sdat_url || '';
-
             const html = `
-              <div style="min-width:220px;font-family:sans-serif;">
-                <strong>Parcel ID:</strong> ${pin}<br>
-                <strong>Address:</strong> ${addr}<br>
+              <div style="min-width:220px">
+                <strong>${addr || pin}</strong><br/>
+                ${pin ? `Parcel ID: ${pin}<br/>` : ''}
                 ${sdat ? `<a href="${sdat}" target="_blank" rel="noopener noreferrer">View SDAT</a>` : ''}
-              </div>
-            `;
+              </div>`;
             layer.bindPopup(html);
           }
         }).addTo(map);
-
-        setStatus('Loaded successfully');
-        setTimeout(() => {
-          if (statusEl) statusEl.style.display = 'none';
-        }, 2000);
+        setStatus('Loaded');
+        setTimeout(() => { if (statusEl) statusEl.style.display = 'none'; }, 2000);
       })
-      .catch(err => {
-        console.error('Error loading points:', err);
-        setStatus('Error loading points: ' + err.message);
-      });
+      .catch(e => setStatus('Error loading points: ' + e));
+
+    function varColor() {
+      return getComputedStyle(document.documentElement)
+        .getPropertyValue('--bmore-brick')
+        .trim() || '#A34D2E';
+    }
   </script>
 </body>
 </html>
