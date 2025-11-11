@@ -1,9 +1,11 @@
 import pandas as pd
 import geopandas as gpd
 
+
 # ---------- CONFIG ----------
 PARCELS_FILE         = "data_local/parcels_citywide.geojson"
-PROJECTS_CSV         = "data_local/project_parcels.csv"
+PROJECTS_PARCELS_CSV         = "data_local/project_parcels.csv"
+PROJECT_LIST_CSV     = "data_local/project_list.csv"
 CUSTOM_PARCELS       = "data_local/custom_parcels.geojson"
 
 PARCEL_KEY_COL       = "PIN"                # unique ID in parcel data
@@ -14,6 +16,7 @@ OUT_PARCELS          = "data/projects_parcels.geojson"
 OUT_PROJECT_POLYS    = "data/projects_polys.geojson"
 SIMPLIFY_TOL         = 0.00005              # tweak if polygons feel heavy
 # -----------------------------
+
 
 def load_parcels():
     parcels = gpd.read_file(PARCELS_FILE)
@@ -38,55 +41,40 @@ def load_parcels():
 
     return parcels
 
+
+
 def load_projects_table():
+    
     # Expect columns:
     # parcel_id, project_id, project_name
-    projects = pd.read_csv(PROJECTS_CSV, dtype={"parcel_id": str, "project_id": str, "project_name": str})
-
-    return projects
-
-
-
-
-def build_parcel_layers(merged: gpd.GeoDataFrame):
-    """
-    Build:
-      - projects_parcels.geojson   (one feature per parcel)
-    """
-    merged["display_address"] = merged[PARCEL_ADDRESS_COL]
-    merged["sdat_url"] = merged[PARCEL_SDAT_COL]
-
-    parcel_props = [
-        PARCEL_KEY_COL,
-        "display_address",
-        "sdat_url"
-    ]
-
-    # Polygons layer
-    gdf_parcels = gpd.GeoDataFrame(
-        merged[parcel_props + ["geometry"]].copy(),
-        crs="EPSG:4326",
-    )
-    #Simplify geometry for web performance (not sure how much of a difference this makes)
-    gdf_parcels["geometry"] = gdf_parcels.geometry.simplify(
-        SIMPLIFY_TOL, preserve_topology=True
+    parcels_tbl = pd.read_csv(PROJECTS_PARCELS_CSV, dtype={"parcel_id": str, "project_id": str, "project_name": str})
+    
+    
+    #Under construction: combine the two so that more project data can be displayed
+    proj_list = pd.read_csv(PROJECT_LIST_CSV,dtype={"project_id": str, "project_name": str, "project_link": str},
     )
 
-    gdf_parcels.to_file(OUT_PARCELS, driver="GeoJSON")
-    print(f"Wrote {OUT_PARCELS} with {len(gdf_parcels)} features")
+    return parcels_tbl
+
 
 
 def build_project_layer(merged: gpd.GeoDataFrame):
-    """
-    Build:
-      - projects_sites.geojson   (one feature per project_id)
-    Geometry: convex hull of all parcels in the project.
-    """
-    # Only keep rows that have a project_id
-    proj = merged.copy()
     
-    # Dissolve parcels by project_id
-    # This gives us one row per project_id, with unioned geometry (might be MultiPolygon)
+    """
+    Builds:
+      - projects_sites.geojson   (one feature per project_id)
+    """
+       
+    # Split into non-custom vs custom based on PIN suffix
+    pin_str = merged[PARCEL_KEY_COL].astype(str)
+    mask_custom = pin_str.str.endswith("CUST")
+
+    non_custom = merged[~mask_custom].copy()
+    custom     = merged[mask_custom].copy()
+
+
+    # Dissolve non-custom parcels by project_id
+    # This gives us one row per project_id
 
     #Add  additional fields here.
     agg = {
@@ -94,20 +82,10 @@ def build_project_layer(merged: gpd.GeoDataFrame):
         "project_name": "first",
     }
 
-    dissolved = proj.dissolve(by="project_id", aggfunc=agg)
+    dissolved = non_custom.dissolve(by="project_id", aggfunc=agg)
     dissolved = dissolved.reset_index(drop=True)
 
-    # Rename some columns to nicer names
-    dissolved = dissolved.rename(
-        columns={
-            PARCEL_ADDRESS_COL: "display_address",
-            PARCEL_SDAT_COL: "sdat_url",
-        }
-    )
-
-    # Geometry choice:
-    # - dissolved.geometry = union of parcels (could be MultiPolygon)
-    # - convex hull = clean single polygon around them
+    #Convex hull = clean single polygon around them
     dissolved["geometry"] = dissolved.geometry.convex_hull
 
     project_props = [
@@ -115,25 +93,36 @@ def build_project_layer(merged: gpd.GeoDataFrame):
         "project_name",
     ]
 
-    gdf_projects = gpd.GeoDataFrame(
+    #Create non-customer geodataframe
+    gdf_non_custom = gpd.GeoDataFrame(
         dissolved[project_props + ["geometry"]].copy(),
         crs="EPSG:4326",
     )
 
-    gdf_projects["geometry"] = gdf_projects.geometry.simplify(
+    gdf_non_custom["geometry"] = gdf_non_custom.geometry.simplify(
         SIMPLIFY_TOL, preserve_topology=True
     )
 
-    gdf_projects.to_file(OUT_PROJECT_POLYS, driver="GeoJSON")
-    print(f"Wrote {OUT_PROJECT_POLYS} with {len(gdf_projects)} project features")
+    # filter custom parcels to project_props and geometry
+    gdf_custom = gpd.GeoDataFrame(
+        custom[project_props + ["geometry"]].copy(),
+        crs="EPSG:4326",
+    )
+
+    #append gdf_non_custom and gdf_custom
+    gdf_combined = pd.concat([gdf_non_custom, gdf_custom], ignore_index=True)
+
+    gdf_combined.to_file(OUT_PROJECT_POLYS, driver="GeoJSON")
+    print(f"Wrote {OUT_PROJECT_POLYS} with {len(gdf_combined)} project features")
 
 
 
 
 def main():
-    parcels  = load_parcels()
-    projects = load_projects_table()
 
+    parcels  = load_parcels()
+
+    projects = load_projects_table()
     print(f"Loaded {len(parcels)} city parcels, {len(projects)} project parcel rows")
     
     merged = parcels.merge(
@@ -143,13 +132,10 @@ def main():
         how="inner",
         suffixes=("", "_proj"),
     )
-
     print(f"Matched {len(merged)} parcels with custom projects")
-
-    build_parcel_layers(merged)
     
     build_project_layer(merged)
-    
+    print("Complete")
 
 if __name__ == "__main__":
     main()
