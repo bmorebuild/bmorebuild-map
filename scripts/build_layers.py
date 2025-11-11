@@ -4,7 +4,7 @@ import geopandas as gpd
 
 # ---------- CONFIG ----------
 PARCELS_FILE         = "data_local/parcels_citywide.geojson"
-PROJECTS_PARCELS_CSV         = "data_local/project_parcels.csv"
+PROJECTS_PARCELS_CSV = "data_local/project_parcels.csv"
 PROJECT_LIST_CSV     = "data_local/project_list.csv"
 CUSTOM_PARCELS       = "data_local/custom_parcels.geojson"
 
@@ -54,7 +54,14 @@ def load_projects_table():
     proj_list = pd.read_csv(PROJECT_LIST_CSV,dtype={"project_id": str, "project_name": str, "project_link": str},
     )
 
-    return parcels_tbl
+    projects = parcels_tbl.merge(
+        proj_list,
+        on="project_id",
+        how="left",     # parcels can exist even if project_list row missing
+        validate="m:1", # many parcels -> 1 project
+    )
+
+    return projects
 
 
 
@@ -79,7 +86,8 @@ def build_project_layer(merged: gpd.GeoDataFrame):
     #Add  additional fields here.
     agg = {
         "project_id": "first",
-        "project_name": "first",
+        "project_name_y": "first",
+        "project_link": "first",
     }
 
     dissolved = non_custom.dissolve(by="project_id", aggfunc=agg)
@@ -89,8 +97,8 @@ def build_project_layer(merged: gpd.GeoDataFrame):
     dissolved["geometry"] = dissolved.geometry.convex_hull
 
     project_props = [
-        "project_id",
-        "project_name",
+        "project_name_y",
+        "project_link"
     ]
 
     #Create non-customer geodataframe
@@ -133,7 +141,6 @@ def main():
         suffixes=("", "_proj"),
     )
     print(f"Matched {len(merged)} parcels with custom projects")
-    
     build_project_layer(merged)
     print("Complete")
 
