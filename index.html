@@ -79,6 +79,24 @@
         height: 36px;
       }
     }
+    .leaflet-control-home {
+      background: #fff;
+      border-radius: 4px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+    }
+
+    .leaflet-control-home button {
+      border: none;
+      background: none;
+      font-size: 18px;
+      padding: 4px 8px;
+      cursor: pointer;
+      line-height: 1;
+    }
+
+    .leaflet-control-home button:hover {
+      background: rgba(0,0,0,0.05);
+    }
   </style>
 </head>
 <body>
@@ -92,50 +110,83 @@
   <div id="map"></div>
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  <script>
-    const statusEl = document.getElementById('status');
-    const setStatus = msg => { if (statusEl) statusEl.textContent = msg; };
+<script>
+  const statusEl = document.getElementById('status');
+  const setStatus = msg => { if (statusEl) statusEl.textContent = msg; };
 
-    const map = L.map('map').setView([39.2904, -76.6122], 12);
+  // Create map
+  const map = L.map('map').setView([39.2904, -76.6122], 12);
 
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      maxZoom: 19,
-      attribution: '&copy; OpenStreetMap contributors'
-    }).addTo(map);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19,
+    attribution: '&copy; OpenStreetMap contributors'
+  }).addTo(map);
 
-    // Project Parcels
-    setStatus('Loading project sites…');
+  // --- HOME BUTTON CONTROL ---
+  const homeControl = L.control({ position: 'topleft' });
+
+  homeControl.onAdd = function(map) {
+    const container = L.DomUtil.create('div', 'leaflet-control-home');
+    const button = L.DomUtil.create('button', '', container);
+    button.innerHTML = '⌂';       // you can change this to 'Home' if you prefer
+    button.title = 'Reset view';
+
+    L.DomEvent.on(button, 'click', function(e) {
+      L.DomEvent.stopPropagation(e);
+      L.DomEvent.preventDefault(e);
+      const b = window.bmorebuildInitialBounds;
+      if (b && b.isValid && b.isValid()) {
+        map.fitBounds(b, { padding: [20, 20] });
+      } else {
+        map.setView([39.2904, -76.6122], 12);
+      }
+    });
+
+    return container;
+  };
+
+  homeControl.addTo(map);
+
+  // --- LOAD PROJECT POLYGONS ---
+  setStatus('Loading project sites…');
   fetch('data/projects_polys.geojson')
     .then(r => r.ok ? r.json() : Promise.reject(r.status))
     .then(geo => {
       const projects = L.geoJSON(geo, {
         style: {
-          color: '#A34D2E',    // brick color
-          weight: 4,
-          fillOpacity: 0.5
+          color: '#A34D2E',   // brick color
+          weight: 2,
+          fillOpacity: 0.25
         },
         onEachFeature: (feature, layer) => {
           const p = feature.properties || {};
-          const name = p.project_name || 'Unnamed Project';
-          const id = p.project_id || '';
+          const name = p.project_name || 'Unnamed project';
+          const link = p.project_link || '';
+          const id   = p.project_id || '';
+
           const html = `
-            <div style="min-width:220px">
+            <div style="min-width:240px">
               <strong>${name}</strong><br/>
-              ${id ? `<span style="font-size:12px; color:#555;">ID: ${id}</span>` : ''}
-            </div>`;
+              ${id ? `<span style="font-size:12px;color:#555;">ID: ${id}</span><br/>` : ''}
+              ${link ? `<a href="${link}" target="_blank" rel="noopener noreferrer">Project link</a>` : ''}
+            </div>
+          `;
           layer.bindPopup(html);
         }
       }).addTo(map);
 
-      try {
-        const bounds = projects.getBounds();
-        if (bounds.isValid()) map.fitBounds(bounds, { padding: [20, 20] });
-      } catch {}
+      // Save initial bounds for home button
+      const bounds = projects.getBounds();
+      if (bounds && bounds.isValid && bounds.isValid()) {
+        map.fitBounds(bounds, { padding: [20, 20] });
+        window.bmorebuildInitialBounds = bounds;
+      }
 
       setStatus('Loaded');
-      setTimeout(() => { statusEl.style.display = 'none'; }, 2000);
+      setTimeout(() => { if (statusEl) statusEl.style.display = 'none'; }, 2000);
     })
     .catch(e => setStatus('Error loading projects: ' + e));
-  </script>
+</script>
+
 </body>
 </html>
