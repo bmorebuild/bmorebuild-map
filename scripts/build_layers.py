@@ -4,6 +4,7 @@ import geopandas as gpd
 # ---------- CONFIG ----------
 PARCELS_FILE         = "data_local/parcels_citywide.geojson"
 PROJECTS_CSV         = "data_local/project_parcels.csv"
+CUSTOM_PARCELS       = "data_local/custom_parcels.geojson"
 
 PARCEL_KEY_COL       = "PIN"                # unique ID in parcel data
 PARCEL_ADDRESS_COL   = "MAILTOADD"          # readable address
@@ -22,6 +23,19 @@ def load_parcels():
    
     # Normalize parcel key to string
     parcels[PARCEL_KEY_COL] = parcels[PARCEL_KEY_COL].astype(str).str.strip()
+
+    #Load custom polygons (optional override/supplement)
+    try:
+        custom = gpd.read_file(CUSTOM_PARCELS)
+        if custom.crs is None or custom.crs.to_epsg() != 4326:
+            custom = custom.to_crs(4326)
+        custom[PARCEL_KEY_COL] = custom[PARCEL_KEY_COL].astype(str).str.strip()
+
+        parcels = pd.concat([parcels, custom], ignore_index=True)
+        print(f"Loaded {len(custom)} custom parcel geometries")
+    except FileNotFoundError:
+        print("No custom_parcels.geojson found; skipping custom geometries.")
+
     return parcels
 
 def load_projects_table():
