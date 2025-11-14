@@ -34,11 +34,28 @@
       align-items: center;
       gap: 0.6rem;
     }
+
+    
     header img.logo {
-      height: auto;
-      width: 200px;
+      height: 120px;
+      width: auto;
       display: block;
     }
+
+    @media (max-width: 600px) {
+    header {
+      padding: 0.35rem 0.7rem; /* tighter top bar */
+    }
+    header img.logo {
+      width: 150px;        /* smaller base width */
+      max-width: 50vw;     /* prevent overflow */
+    }
+    }
+
+
+
+
+
     header .title-text {
       display: flex;
       flex-direction: column;
