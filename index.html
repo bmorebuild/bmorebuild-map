@@ -117,10 +117,10 @@
   // Create map
   const map = L.map('map').setView([39.2904, -76.6122], 12);
 
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    maxZoom: 19,
-    attribution: '&copy; OpenStreetMap contributors'
-  }).addTo(map);
+  //L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  //  maxZoom: 19,
+  //  attribution: '&copy; OpenStreetMap contributors'
+  //})
 
 
   // Base layers
@@ -131,7 +131,7 @@
   const cartoPositron = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
     maxZoom: 20,
     attribution: '&copy; OpenStreetMap, &copy; CARTO'
-  });
+  }).addTo(map);;
 
   const esriImagery = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
     maxZoom: 19,
