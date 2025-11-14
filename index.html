@@ -122,6 +122,33 @@
     attribution: '&copy; OpenStreetMap contributors'
   }).addTo(map);
 
+
+  // Base layers
+  const osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19, attribution: '&copy; OpenStreetMap'
+  }).addTo(map); // keep your current default
+
+  const cartoPositron = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+    maxZoom: 20,
+    attribution: '&copy; OpenStreetMap, &copy; CARTO'
+  });
+
+  const esriImagery = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+    maxZoom: 19,
+    attribution: 'Tiles &copy; Esri'
+  });
+
+  // Layer control
+  L.control.layers(
+    {
+      "OSM Standard": osm,
+      "Carto Positron": cartoPositron,
+      "Esri Imagery": esriImagery
+    },
+    {}, // overlays (none for now)
+    { position: 'topleft', collapsed: true }
+  ).addTo(map);
+
   // --- HOME BUTTON CONTROL ---
   const homeControl = L.control({ position: 'topleft' });
 
