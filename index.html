@@ -34,10 +34,8 @@
       align-items: center;
       gap: 0.6rem;
     }
-
-
     header img.logo {
-      height: 150px;
+      height: 120px;
       width: auto;
       display: block;
     }
@@ -51,11 +49,6 @@
       max-width: 50vw;     /* prevent overflow */
     }
     }
-
-
-
-
-
     header .title-text {
       display: flex;
       flex-direction: column;
@@ -116,6 +109,12 @@
     }
   </style>
 </head>
+
+
+
+
+
+
 <body>
   <header>
     <div class="brand">
@@ -127,6 +126,8 @@
   <div id="map"></div>
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+
 <script>
   const statusEl = document.getElementById('status');
   const setStatus = msg => { if (statusEl) statusEl.textContent = msg; };
@@ -149,13 +150,20 @@
     attribution: 'Tiles &copy; Esri'
   });
 
+  const baseLayers = {
+      "OSM Standard": osm,
+      "Carto Positron": cartoPositron,
+      "Esri Imagery": esriImagery
+   };
+
+
    // Home button control
   const homeControl = L.control({ position: 'topleft' });
 
   homeControl.onAdd = function(map) {
     const container = L.DomUtil.create('div', 'leaflet-control-home');
     const button = L.DomUtil.create('button', '', container);
-    button.innerHTML = '⌂';       // you can change this to 'Home' if you prefer
+    button.innerHTML = 'Home';
     button.title = 'Reset view';
 
     L.DomEvent.on(button, 'click', function(e) {
@@ -168,64 +176,86 @@
         map.setView([39.2904, -76.6122], 12);
       }
     });
+    return container;
+  };
+  homeControl.addTo(map);
 
   // Layer control
-  L.control.layers(
-    {
-      "OSM Standard": osm,
-      "Carto Positron": cartoPositron,
-      "Esri Imagery": esriImagery
-    },
-    {}, // overlays (none for now)
+  const layerControl = L.control.layers(baseLayers,
+    {}, // overlays will be added
     { position: 'topleft', collapsed: true }
   ).addTo(map);
 
- 
+  // --- PROJECT LAYERS: Under Construction + Completed 2025 ---
 
-    return container;
-  };
+  let projectsUC = null;
+  let projects2025 = null;
 
-  homeControl.addTo(map);
+  // Helper: bind popup using project_name + project_link
+  function bindProjectPopup(feature, layer) {
+    const p = feature.properties || {};
+    const name = p.project_name || 'Unnamed project';
+    const link = p.project_link || '';
 
-  // --- LOAD PROJECT POLYGONS ---
-  setStatus('Loading project sites…');
-  fetch('data/projects_polys.geojson')
+    const html = `
+      <div style="min-width:240px">
+        ${link
+          ? `<a href="${link}" target="_blank" rel="noopener noreferrer"><strong>${name}</strong></a>`
+          : `<strong>${name}</strong>`}
+      </div>
+    `;
+    layer.bindPopup(html);
+  }
+
+  // Load UNDER_CONSTRUCTION.geojson (default visible)
+  setStatus('Loading under-construction projects…');
+  fetch('data/UNDER_CONSTRUCTION.geojson')
     .then(r => r.ok ? r.json() : Promise.reject(r.status))
     .then(geo => {
-      const projects = L.geoJSON(geo, {
+      projectsUC = L.geoJSON(geo, {
         style: {
-          color: '#A34D2E',   // brick color
+          color: '#A34D2E',   // brick color for active builds
           weight: 2,
-          fillOpacity: 0.25
+          fillOpacity: 0.4
         },
-        onEachFeature: (feature, layer) => {
-          const p = feature.properties || {};
-          const name = p.project_name_y || 'Unnamed project';
-          const link = p.project_link || '';
-          const id   = p.project_id || '';
-
-          const html = `
-            <div style="min-width:240px">
-              <strong>${name}</strong><br/>
-              ${id ? `<span style="font-size:12px;color:#555;">ID: ${id}</span><br/>` : ''}
-              ${link ? `<a href="${link}" target="_blank" rel="noopener noreferrer">${link}</a>` : ''}
-            </div>
-          `;
-          layer.bindPopup(html);
-        }
+        onEachFeature: bindProjectPopup
       }).addTo(map);
 
-      // Save initial bounds for home button
-      const bounds = projects.getBounds();
-      if (bounds && bounds.isValid && bounds.isValid()) {
-        map.fitBounds(bounds, { padding: [20, 20] });
-        window.bmorebuildInitialBounds = bounds;
+      // Add to layer control as an overlay
+      layerControl.addOverlay(projectsUC, 'Under construction');
+
+      // Set initial bounds for home button
+      const b = projectsUC.getBounds();
+      if (b && b.isValid && b.isValid()) {
+        map.fitBounds(b, { padding: [20, 20] });
+        window.bmorebuildInitialBounds = b;
       }
 
-      setStatus('Loaded');
+      setStatus('Loaded under-construction projects');
+    })
+    .catch(e => setStatus('Error loading UNDER_CONSTRUCTION: ' + e));
+
+  // Load COMPLETED_2025.geojson (overlay, off by default)
+  fetch('data/COMPLETED_2025.geojson')
+    .then(r => r.ok ? r.json() : Promise.reject(r.status))
+    .then(geo => {
+      projects2025 = L.geoJSON(geo, {
+        style: {
+          color: '#2E6FA3',   // harbor-ish blue for completed
+          weight: 2,
+          fillOpacity: 0.3
+        },
+        onEachFeature: bindProjectPopup
+      });
+
+      // Add to layer control but don’t addTo(map) yet (user toggles it)
+      layerControl.addOverlay(projects2025, 'Completed (2025)');
+
+      setStatus('Loaded all project layers');
       setTimeout(() => { if (statusEl) statusEl.style.display = 'none'; }, 2000);
     })
-    .catch(e => setStatus('Error loading projects: ' + e));
+    .catch(e => setStatus('Error loading COMPLETED_2025: ' + e));
+
 </script>
 
 </body>
