@@ -11,8 +11,8 @@ data_local/
 *.shx
 *.zip
 *.geojson
-!data/projects_polys.geojson
-!data/projects_parcels.geojson
+!data/COMPLETED_2025.geojson
+!data/UNDER_CONSTRUCTION.geojson
 
 # --- System/editor ---
 .DS_Store
