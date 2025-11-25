@@ -20,6 +20,13 @@
       display: flex;
       flex-direction: column;
     }
+
+    .flags {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;   /* space between the two flags */
+    }
+
     header {
       flex: 0 0 auto;
       display: flex;
@@ -29,16 +36,18 @@
       background: var(--bmore-sand);
       box-shadow: 0 2px 4px rgba(0,0,0,0.15);
     }
+
     header .brand {
       display: flex;
       align-items: center;
       gap: 0.6rem;
     }
+    
     header img.logo {
-      height: 120px;
+      height: 120px;      /* was 120px */
       width: auto;
       display: block;
-    }
+    } 
 
     .header-right {
       display: flex;
@@ -46,24 +55,12 @@
       gap: 0.5rem;
     }
 
-    .flag-icon {
-      height: 50 px;
-      width: auto;
-      border-radius: 3px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.25);
-    }
-
-    header img.logo {
-      width: 120px;        /* smaller base width */
-      max-width: 50vw;     /* prevent overflow */
-    }
-  
-    
     header .title-text {
       display: flex;
       flex-direction: column;
       line-height: 1.1;
     }
+
     header .title-text span.name {
       font-weight: 700;
       letter-spacing: 0.04em;
@@ -71,10 +68,16 @@
       font-size: 0.9rem;
       color: var(--bmore-brick);
     }
+
     header .title-text span.tagline {
       font-size: 0.75rem;
       color: #555;
     }
+
+    header img.flag-icon {
+      height: 90px; 
+    }
+
     #map {
       flex: 1 1 auto;
       height: auto;
@@ -88,11 +91,15 @@
       header img.logo {
         height: 36px;
       }
-      .flag-icon { height: 36px; }
+      
+      .flag-icon { 
+        height: 36px;          
+      }
 
       header {
       padding: 0.35rem 0.7rem; /* tighter top bar */
-    }
+    }}
+
     .leaflet-control-home {
       background: #fff;
       border-radius: 4px;
@@ -122,12 +129,11 @@
 <body>
   <header>
     <div class="brand">
-      <img src="img/bmorebuild_md_logo.png" alt="BmoreBuild logo" class="logo" />
+      <img src="img/bmorebuild_md_logo.png"  class="logo" alt="BmoreBuild logo" />
     </div>
   
     <div class="header-right">
     <div class="flags">
-      <img src="img/Flag_of_Maryland.png" class="flag-icon" alt="Maryland flag" />
       <img src="img/Baltimore_Flag.svg" class="flag-icon" alt="Baltimore flag" />
     </div>
   </div>
@@ -192,6 +198,7 @@
   };
   homeControl.addTo(map);
 
+
   // Layer control
   const layerControl = L.control.layers(baseLayers,
     {}, // overlays will be added
@@ -202,6 +209,34 @@
 
   let projectsUC = null;
   let projects2025 = null;
+
+
+  // Helper: add hover highlight behavior to a polygon layer
+  function attachHoverHighlight(layer) {
+    const originalStyle = {
+      color: layer.options.color,
+      weight: layer.options.weight,
+      fillOpacity: layer.options.fillOpacity
+    };
+
+    layer.on('mouseover', function () {
+      layer.setStyle({
+        weight: originalStyle.weight + 1.5,
+        color: '#000000',
+        fillOpacity: Math.min(originalStyle.fillOpacity + 0.20, 0.85)
+      });
+
+      // bring to front so edges aren't hidden
+      if (layer.bringToFront) {
+        layer.bringToFront();
+      }
+    });
+
+    layer.on('mouseout', function () {
+      layer.setStyle(originalStyle);
+    });
+  }
+
 
   // Helper: bind popup using project_name + project_link
   function bindProjectPopup(feature, layer) {
@@ -219,6 +254,8 @@
     layer.bindPopup(html);
   }
 
+
+
   // Load UNDER_CONSTRUCTION.geojson (default visible)
   setStatus('Loading under-construction projects…');
   fetch('data/UNDER_CONSTRUCTION.geojson')
@@ -230,8 +267,14 @@
           weight: 2,
           fillOpacity: 0.4
         },
-        onEachFeature: bindProjectPopup
+
+        onEachFeature: (feature, layer) => {
+          bindProjectPopup(feature, layer);
+          attachHoverHighlight(layer);
+        }
       }).addTo(map);
+
+
 
       // Add to layer control as an overlay
       layerControl.addOverlay(projectsUC, 'Under construction');
@@ -247,6 +290,8 @@
     })
     .catch(e => setStatus('Error loading UNDER_CONSTRUCTION: ' + e));
 
+
+
   // Load COMPLETED_2025.geojson (overlay, off by default)
   fetch('data/COMPLETED_2025.geojson')
     .then(r => r.ok ? r.json() : Promise.reject(r.status))
@@ -257,14 +302,18 @@
           weight: 2,
           fillOpacity: 0.3
         },
-        onEachFeature: bindProjectPopup
+        onEachFeature: (feature, layer) => {
+          bindProjectPopup(feature, layer);
+          attachHoverHighlight(layer);
+        }
       });
+
 
       // Add to layer control but don’t addTo(map) yet (user toggles it)
       layerControl.addOverlay(projects2025, 'Completed (2025)');
 
       setStatus('Loaded all project layers');
-      setTimeout(() => { if (statusEl) statusEl.style.display = 'none'; }, 2000);
+      setTimeout(() => { if (statusEl) statusEl.style.display = 'none'; }, 1000);
     })
     .catch(e => setStatus('Error loading COMPLETED_2025: ' + e));
 
