@@ -56,11 +56,10 @@ def load_projects_table():
 
     print("Load CSVs")
     #load parcel csv file and retain all columns except project_name
-    parcels_tbl = pd.read_csv(PROJECTS_PARCELS_CSV, dtype={"parcel_id": str, "project_id": str, "project_status": str, "completed_year":str})
+    parcels_tbl = pd.read_csv(PROJECTS_PARCELS_CSV, dtype={"parcel_id": str, "project_id": str})
     
     #load project list csv file and retain all columns
-    proj_list = pd.read_csv(PROJECT_LIST_CSV,dtype={"project_id": str, "project_name": str, "project_link": str},
-    )
+    proj_list = pd.read_csv(PROJECT_LIST_CSV,dtype={"project_id": str, "project_name": str,"project_status": str, "completed_year":str, "project_link": str})
 
     print(f"    project_parcels.csv: {len(parcels_tbl)} parcels")
     print(f"    project_list.csv: {len(proj_list)} projects")
@@ -100,9 +99,9 @@ def build_project_layer(merged: gpd.GeoDataFrame):
     agg = {
         "project_id": "first",
         "project_name": "first",
-        "project_link": "first",
         "project_status": "first",
-        "completed_year": "first"
+        "completed_year": "first",
+        "project_link": "first"
     }
 
     dissolved = non_custom.dissolve(by="project_id", aggfunc=agg)
@@ -114,9 +113,9 @@ def build_project_layer(merged: gpd.GeoDataFrame):
     keep = [
         "project_id",
         "project_name",
-        "project_link",
         "project_status",
-        "completed_year"
+        "completed_year",
+        "project_link"
     ]
 
     #Create non-custom geodataframe
