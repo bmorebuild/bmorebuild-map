@@ -118,6 +118,62 @@
     .leaflet-control-home button:hover {
       background: rgba(0,0,0,0.05);
     }
+
+    /* --- Themed popups --- */
+
+  .bmore-popup .leaflet-popup-content-wrapper {
+    background: var(--bmore-sand);
+    border-radius: 8px;
+    box-shadow: 0 6px 16px rgba(0,0,0,0.25);
+    border: 1px solid rgba(0,0,0,0.12);
+  }
+
+  .bmore-popup .leaflet-popup-tip {
+    background: var(--bmore-sand);
+    border: 1px solid rgba(0,0,0,0.12);
+  }
+
+  .bmore-popup .leaflet-popup-content {
+    margin: 10px 12px;
+  }
+
+  .popup-inner {
+    font-size: 0.9rem;
+    color: #4a3328;  /* warm dark, pairs with brick */
+  }
+
+  .popup-title {
+    font-weight: 700;
+    margin-bottom: 4px;
+    color: var(--bmore-brick);
+  }
+
+  .popup-title a {
+    color: var(--bmore-brick);
+    text-decoration: none;
+  }
+
+  .popup-title a:hover {
+    text-decoration: underline;
+  }
+
+  .popup-meta {
+    font-size: 0.78rem;
+    color: #666;
+    margin-bottom: 4px;
+    letter-spacing: 0.04em;
+  }
+
+  .popup-img {
+    display: block;
+    width: 100%;
+    max-width: 280px;   /* don’t let it be too wide on desktop */
+    max-height: 200px;  /* keep very tall images under control */
+    height: auto;
+    border-radius: 6px;
+    object-fit: cover;
+    margin-top: 6px;
+  }
   </style>
 </head>
 
@@ -241,17 +297,41 @@
   // Helper: bind popup using project_name + project_link
   function bindProjectPopup(feature, layer) {
     const p = feature.properties || {};
-    const name = p.project_name || 'Unnamed project';
-    const link = p.project_link || '';
+
+    const name   = p.project_name || 'Unnamed project';
+    const link   = p.project_link || '';
+    const status = p.project_status || '';
+    const year   = p.completed_year || '';
+    const imgUrl = p.image_url || '';   // we'll use this in a sec
+
+    let statusLine = '';
+    if (status === 'Under Construction') {
+      statusLine = 'Under construction';
+    } else if (status === 'Completed' && year) {
+      statusLine = `Completed ${year}`;
+    }
+
+    const statusHtml = statusLine
+      ? `<div class="popup-meta">${statusLine}</div>`
+      : '';
+
+    const imgHtml = imgUrl
+      ? `<img src="${imgUrl}" class="popup-img" alt="${name}"/>`
+      : '';
+
+    const titleHtml = link
+      ? `<a href="${link}" target="_blank" rel="noopener noreferrer">${name}</a>`
+      : name;
 
     const html = `
-      <div style="min-width:240px">
-        ${link
-          ? `<a href="${link}" target="_blank" rel="noopener noreferrer"><strong>${name}</strong></a>`
-          : `<strong>${name}</strong>`}
+      <div class="popup-inner">
+        <div class="popup-title">${titleHtml}</div>
+        ${statusHtml}
+        ${imgHtml}
       </div>
     `;
-    layer.bindPopup(html);
+
+    layer.bindPopup(html, { className: 'bmore-popup' });
   }
 
 

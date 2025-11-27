@@ -101,7 +101,8 @@ def build_project_layer(merged: gpd.GeoDataFrame):
         "project_name": "first",
         "project_status": "first",
         "completed_year": "first",
-        "project_link": "first"
+        "project_link": "first",
+        "image_url":"first"
     }
 
     dissolved = non_custom.dissolve(by="project_id", aggfunc=agg)
@@ -115,7 +116,8 @@ def build_project_layer(merged: gpd.GeoDataFrame):
         "project_name",
         "project_status",
         "completed_year",
-        "project_link"
+        "project_link",
+        "image_url",
     ]
 
     #Create non-custom geodataframe
