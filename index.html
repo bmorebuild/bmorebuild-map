@@ -7,14 +7,35 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <style>
     :root {
-      --bmore-brick: #A34D2E;
-      --bmore-sand: #fff9e9;
+      --bg-main:        #fff9ed;   /* warm parchment */
+      --bg-panel:       #FFF9E9;   /* slightly brighter for cards/panels */
+      --bg-subtle:      #F3ECDC;   /* map overlays, subtle sections */
+
+      --ink-primary:    #3A2418;   /* dark brown, not black */
+      --ink-secondary:  #6A4A3A;   /* softer brown for metadata */
+  
+      --brick-main:     #B35A2E;   /* primary accent */
+      --brick-soft:     #C87345;   /* hover states, highlights */
+      --brick-dark:     #8F3F1E;   /* active/selected */
+
+      --civic-blue:     #5F7D7A;   /* cornice-inspired blue-green */
+      --civic-blue-soft:#7F9A96;
+
+
+      --accent-gold:    #C9A24D;
+
     }
+
+
+
+
+
+
     html, body {
       height: 100%;
       margin: 0;
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background: var(--bmore-sand);
+      background: var(--bg-main);
     }
     body {
       display: flex;
@@ -33,7 +54,7 @@
       align-items: center;
       justify-content: space-between;
       padding: 0.4rem 0.9rem;
-      background: var(--bmore-sand);
+      background: var(--bg-main);
       box-shadow: 0 2px 4px rgba(0,0,0,0.15);
     }
 
@@ -44,7 +65,7 @@
     }
     
     header img.logo {
-      height: 120px;      /* was 120px */
+      height: 180px;      /* was 120px */
       width: auto;
       display: block;
     } 
@@ -66,7 +87,7 @@
       letter-spacing: 0.04em;
       text-transform: uppercase;
       font-size: 0.9rem;
-      color: var(--bmore-brick);
+      color: var(--ink-primary);
     }
 
     header .title-text span.tagline {
@@ -122,14 +143,14 @@
     /* --- Themed popups --- */
 
   .bmore-popup .leaflet-popup-content-wrapper {
-    background: var(--bmore-sand);
+    background: var(--bg-main);
     border-radius: 8px;
     box-shadow: 0 6px 16px rgba(0,0,0,0.25);
     border: 1px solid rgba(0,0,0,0.12);
   }
 
   .bmore-popup .leaflet-popup-tip {
-    background: var(--bmore-sand);
+    background: var(--bg-main);
     border: 1px solid rgba(0,0,0,0.12);
   }
 
@@ -141,17 +162,17 @@
 
   .popup-inner {
     font-size: 0.9rem;
-    color: #4a3328;  /* warm dark, pairs with brick */
+    color: var(--ink-primary); 
   }
 
   .popup-title {
     font-weight: 700;
     margin-bottom: 4px;
-    color: var(--bmore-brick);
+    color: var(--ink-primary);
   }
 
   .popup-title a {
-    color: var(--bmore-brick);
+    color: var(--ink-primary);
     text-decoration: none;
   }
 
@@ -176,8 +197,162 @@
     object-fit: cover;
     margin-top: 6px;
   }
+  
+
+  .project-panel {
+  position: absolute;
+  top: 140px;              /* below header */
+  right: 20px;
+  width: 300px;
+  bottom: 16px;           /* stop above the bottom of the viewport */
+
+  background: #FFF9E6; /* your sand tone */
+  border-radius: 8px;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.25);
+  border: 1px solid rgba(0,0,0,0.15);
+  
+  z-index: 1500;
+  overflow: hidden;
+
+  display: none;          /* hidden by default */
+  flex-direction: column;
+  }
+
+  .project-panel.open {
+    display: flex;
+  }
+
+  .project-panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 6px 10px;
+    border-bottom: 1px solid rgba(0,0,0,0.1);
+    background: rgba(255,255,255,0.8);
+  }
+
+  .project-panel-header span {
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #5a3a2a;
+  }
+
+  .panel-close {
+    border: none;
+    background: transparent;
+    font-size: 1rem;
+    cursor: pointer;
+  }
+
+  .project-panel-body {
+    flex: 1 1 auto;     /* fill remaining vertical space */
+    overflow-y: auto;
+    padding: 4px 0;
+  }
+
+  .project-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .project-item {
+    padding: 6px 10px;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+    cursor: pointer;
+  }
+
+  .project-item:hover {
+    background: rgba(0,0,0,0.04);
+  }
+
+  .project-item-title {
+    font-size: 0.9rem;
+    font-weight: 500;
+    margin-bottom: 2px;
+  }
+
+  .project-item-meta {
+    font-size: 0.75rem;
+    color: #6a5b50;
+  }
+
+
+
+
+  .about-overlay {
+  position: fixed;
+  inset: 0;                         /* top:0; right:0; bottom:0; left:0 */
+  display: none;                    /* hidden by default */
+  z-index: 2000;                    /* above map & project panel */
+}
+
+.about-overlay.open {
+  display: block;
+}
+
+.about-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);  /* semi-transparent dark */
+}
+
+.about-panel {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  max-width: 520px;
+  width: calc(100% - 40px);
+  background: var(--bg-main);
+  border-radius: 10px;
+  box-shadow: 0 12px 30px rgba(0,0,0,0.35);
+  padding: 18px 20px 16px 20px;
+  border: 1px solid var(--bmore-brick);
+}
+
+.about-panel h2 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.25rem;
+  color: var(--bmore-brick);
+}
+
+.about-panel p {
+  margin: 0 0 0.5rem 0;
+  font-size: 0.9rem;
+  line-height: 1.45;
+  color: var(--bmore-brick);
+}
+
+.about-close {
+  position: absolute;
+  top: 6px;
+  right: 8px;
+  border: none;
+  background: transparent;
+  font-size: 1.2rem;
+  cursor: pointer;
+}
+
+
   </style>
 </head>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -187,29 +362,108 @@
 <body>
   <header>
     <div class="brand">
-      <img src="img/bmorebuild_md_logo.png"  class="logo" alt="BmoreBuild logo" />
+      <img src="img/bmorebuild_logo.jpeg"  class="logo" alt="BmoreBuild logo" />
     </div>
   
-    <div class="header-right">
-    <div class="flags">
-      <img src="img/Baltimore_Flag.svg" class="flag-icon" alt="Baltimore flag" />
+      <div class="header-right">
+
+        <button id="about-btn" class="header-btn">About</button>
+
+        <button id="projects-btn" class="header-btn">Projects</button>
+
+        <div class="flags">
+          <img src="img/Baltimore_Flag.svg" class="flag-icon" alt="Baltimore flag" />
+        </div>
     </div>
-  </div>
   </header>
 
 
   <div id="status">Loading map…</div>
   <div id="map"></div>
 
+
+
+
+  <div id="project-panel" class="project-panel">
+    <div class="project-panel-header">
+      <span>Projects</span>
+      <button id="project-panel-close" class="panel-close" aria-label="Close projects list">×</button>
+    </div>
+
+    <div class="project-panel-body">
+      <ul id="project-list" class="project-list"></ul>
+    </div>
+  </div>
+
+
+  <div id="about-overlay" class="about-overlay">
+    <div class="about-backdrop"></div>
+      <div class="about-panel">
+        <button id="about-close" class="about-close" aria-label="Close About panel">×</button>
+        <h2>About B’more Build</h2>
+        <p>
+          B’more Build is a map of major construction projects in Baltimore City. It tracks where new buildings are rising,
+          what’s recently been completed, and how the city’s physical environment is changing.
+        </p>
+        <p>
+          
+      </div>
+  </div>
+
+
+
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 <script>
   const statusEl = document.getElementById('status');
   const setStatus = msg => { if (statusEl) statusEl.textContent = msg; };
 
+
+
+
+
+
+
+
+
+
+
   // Create map
   const map = L.map('map').setView([39.2904, -76.6122], 12);
+
+
+
+
+
 
   // Base layers
   const osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -231,6 +485,18 @@
       "Carto Positron": cartoPositron,
       "Esri Imagery": esriImagery
    };
+
+
+
+
+
+   // Store project info for the sidebar list (table)
+  const projectRecords = [];   // each: { name, status, year, layer }
+  let projectLayersLoaded = 0; // count how many layers finished loading
+
+
+
+
 
 
    // Home button control
@@ -257,16 +523,37 @@
   homeControl.addTo(map);
 
 
+
+
+
+
+
   // Layer control
   const layerControl = L.control.layers(baseLayers,
     {}, // overlays will be added
     { position: 'topleft', collapsed: true }
   ).addTo(map);
 
+
+
+
+
+
+
+
+
+
   // --- PROJECT LAYERS: Under Construction + Completed 2025 ---
 
   let projectsUC = null;
   let projects2025 = null;
+
+
+
+
+
+
+
 
 
   // Helper: add hover highlight behavior to a polygon layer
@@ -294,6 +581,14 @@
       layer.setStyle(originalStyle);
     });
   }
+
+
+
+
+
+
+
+
 
 
   // Helper: bind popup using project_name + project_link
@@ -334,7 +629,50 @@
     `;
 
     layer.bindPopup(html, { className: 'bmore-popup' });
+
+
+    //Return normalized info (for table)
+    return { name, status, year, link };
+
+
   }
+
+
+
+
+
+  // TEMP: open the project panel and add dummy items (for testing layout)
+  document.addEventListener('DOMContentLoaded', () => {
+    const panel = document.getElementById('project-panel');
+    const list  = document.getElementById('project-list');
+
+    if (panel && list) {
+      panel.classList.add('open');
+
+      ['Project A', 'Project B', 'Project C'].forEach(name => {
+        const li = document.createElement('li');
+        li.className = 'project-item';
+
+        const title = document.createElement('div');
+        title.className = 'project-item-title';
+        title.textContent = name;
+
+        const meta = document.createElement('div');
+        meta.className = 'project-item-meta';
+        meta.textContent = 'Under construction';
+
+        li.appendChild(title);
+        li.appendChild(meta);
+        list.appendChild(li);
+      });
+    }
+  });
+
+
+
+
+
+
 
 
 
@@ -345,16 +683,29 @@
     .then(geo => {
       projectsUC = L.geoJSON(geo, {
         style: {
-          color: '#A34D2E',   // brick color for active builds
+          color: '#C44A2A',   // brick color for active builds
           weight: 2,
           fillOpacity: 0.4
         },
 
         onEachFeature: (feature, layer) => {
-          bindProjectPopup(feature, layer);
+          const rec = bindProjectPopup(feature, layer);
           attachHoverHighlight(layer);
+
+          // store for table
+          projectRecords.push({
+            name:   rec.name,
+            status: rec.status,
+            year:   rec.year,
+            layer:  layer
+          });
         }
       }).addTo(map);
+
+
+
+      projectLayersLoaded += 1;
+      maybeBuildProjectList();
 
 
 
@@ -374,30 +725,164 @@
 
 
 
+
+
+
   // Load COMPLETED_2025.geojson (overlay, off by default)
   fetch('data/COMPLETED_2025.geojson')
     .then(r => r.ok ? r.json() : Promise.reject(r.status))
     .then(geo => {
       projects2025 = L.geoJSON(geo, {
         style: {
-          color: '#2E6FA3',   // harbor-ish blue for completed
+          color: '#2F6F8F', 
           weight: 2,
           fillOpacity: 0.3
         },
         onEachFeature: (feature, layer) => {
-          bindProjectPopup(feature, layer);
+          const rec = bindProjectPopup(feature, layer);
           attachHoverHighlight(layer);
+
+          // store for table
+          projectRecords.push({
+            name:   rec.name,
+            status: rec.status,
+            year:   rec.year,
+            layer:  layer
+          });
         }
       });
-
 
       // Add to layer control but don’t addTo(map) yet (user toggles it)
       layerControl.addOverlay(projects2025, 'Completed (2025)');
 
       setStatus('Loaded all project layers');
       setTimeout(() => { if (statusEl) statusEl.style.display = 'none'; }, 1000);
+
+      projectLayersLoaded += 1;
+      maybeBuildProjectList();
+
     })
     .catch(e => setStatus('Error loading COMPLETED_2025: ' + e));
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    function maybeBuildProjectList() {
+      // wait until both layers are done
+      if (projectLayersLoaded < 2) return;
+      buildProjectList();
+    }
+
+    function buildProjectList() {
+      const listEl = document.getElementById('project-list');
+      if (!listEl) return;
+
+      // sort: UC first, then completed, then by name
+      const sorted = projectRecords.slice().sort((a, b) => {
+        const aUC = (a.status === 'Under Construction');
+        const bUC = (b.status === 'Under Construction');
+
+        if (aUC !== bUC) {
+          return aUC ? -1 : 1;
+        }
+        return a.name.localeCompare(b.name);
+      });
+
+      listEl.innerHTML = '';
+
+      for (const rec of sorted) {
+        const li = document.createElement('li');
+        li.className = 'project-item';
+
+        const titleDiv = document.createElement('div');
+        titleDiv.className = 'project-item-title';
+        titleDiv.textContent = rec.name;
+
+        const metaDiv = document.createElement('div');
+        metaDiv.className = 'project-item-meta';
+
+        if (rec.status === 'Under Construction') {
+          metaDiv.textContent = 'Under construction';
+        } else if (rec.year) {
+          metaDiv.textContent = `Completed ${rec.year}`;
+        } else {
+          metaDiv.textContent = rec.status || '';
+        }
+
+        li.appendChild(titleDiv);
+        li.appendChild(metaDiv);
+
+        // click: zoom + popup
+        li.addEventListener('click', () => {
+          if (rec.layer && rec.layer.getBounds) {
+            const b = rec.layer.getBounds();
+            if (b && b.isValid && b.isValid()) {
+              map.fitBounds(b, { padding: [20, 20] });
+            }
+          }
+          if (rec.layer && rec.layer.openPopup) {
+            rec.layer.openPopup();
+          }
+        });
+
+        listEl.appendChild(li);
+      }
+    }
+
+
+
+
+    // Project panel open/close
+    const projectsBtn   = document.getElementById('projects-btn');
+    const projectPanel  = document.getElementById('project-panel');
+    const projectClose  = document.getElementById('project-panel-close');
+
+    if (projectsBtn && projectPanel && projectClose) {
+      projectsBtn.addEventListener('click', () => {
+        projectPanel.classList.add('open');
+      });
+
+      projectClose.addEventListener('click', () => {
+        projectPanel.classList.remove('open');
+      });
+    }
+
+    // About overlay open/close
+    const aboutBtn     = document.getElementById('about-btn');
+    const aboutOverlay = document.getElementById('about-overlay');
+    const aboutClose   = document.getElementById('about-close');
+
+    if (aboutBtn && aboutOverlay && aboutClose) {
+      aboutBtn.addEventListener('click', () => {
+        aboutOverlay.classList.add('open');
+      });
+
+      aboutClose.addEventListener('click', () => {
+        aboutOverlay.classList.remove('open');
+      });
+
+      // Optional: click backdrop to close
+      const backdrop = aboutOverlay.querySelector('.about-backdrop');
+      if (backdrop) {
+        backdrop.addEventListener('click', () => {
+          aboutOverlay.classList.remove('open');
+        });
+      }
+    }
+
+
 
 </script>
 

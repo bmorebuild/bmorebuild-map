@@ -12,7 +12,7 @@ python scripts/build_layers.py
 
 echo "🔹 Staging updated data..."
 git add data/*.geojson
-
+git add img/projects/
 timestamp=$(date +"%Y-%m-%d %H:%M")
 git commit -m "Data update: $timestamp"
 
