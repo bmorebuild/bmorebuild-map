@@ -556,8 +556,8 @@
     layer.on('mouseover', function () {
       layer.setStyle({
         weight: originalStyle.weight + 1.5,
-        color: '#000000',
-        fillOpacity: Math.min(originalStyle.fillOpacity + 0.20, 0.85)
+        color: originalStyle.color,
+        fillOpacity: Math.min(originalStyle.fillOpacity + 0.35, 0.85)
       });
 
       // bring to front so edges aren't hidden
