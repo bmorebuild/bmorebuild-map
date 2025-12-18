@@ -7,22 +7,10 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <style>
     :root {
-      --bg-main:        #fff9ed;   /* warm parchment */
-      --bg-panel:       #FFF9E9;   /* slightly brighter for cards/panels */
-      --bg-subtle:      #F3ECDC;   /* map overlays, subtle sections */
+      --bg-sand:    #FFFAE3;  /* warm off-white */
+      --ink-dark:   #38210B;  /* dark brown-black for text */
+      --brick-main: #C23E11;  /* Baltimore brick, vibrant */
 
-      --ink-primary:    #3A2418;   /* dark brown, not black */
-      --ink-secondary:  #6A4A3A;   /* softer brown for metadata */
-  
-      --brick-main:     #B35A2E;   /* primary accent */
-      --brick-soft:     #C87345;   /* hover states, highlights */
-      --brick-dark:     #8F3F1E;   /* active/selected */
-
-      --civic-blue:     #5F7D7A;   /* cornice-inspired blue-green */
-      --civic-blue-soft:#7F9A96;
-
-
-      --accent-gold:    #C9A24D;
 
     }
 
@@ -35,8 +23,9 @@
       height: 100%;
       margin: 0;
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background: var(--bg-main);
+      background: var(--bg-sand);
     }
+
     body {
       display: flex;
       flex-direction: column;
@@ -54,7 +43,7 @@
       align-items: center;
       justify-content: space-between;
       padding: 0.4rem 0.9rem;
-      background: var(--bg-main);
+      background: var(--bg-sand);
       box-shadow: 0 2px 4px rgba(0,0,0,0.15);
     }
 
@@ -65,7 +54,7 @@
     }
     
     header img.logo {
-      height: 180px;      /* was 120px */
+      height: 150px;      /* was 120px */
       width: auto;
       display: block;
     } 
@@ -87,7 +76,7 @@
       letter-spacing: 0.04em;
       text-transform: uppercase;
       font-size: 0.9rem;
-      color: var(--ink-primary);
+      color: var(--ink-dark);
     }
 
     header .title-text span.tagline {
@@ -143,14 +132,14 @@
     /* --- Themed popups --- */
 
   .bmore-popup .leaflet-popup-content-wrapper {
-    background: var(--bg-main);
+    background: var(--bg-sand);
     border-radius: 8px;
     box-shadow: 0 6px 16px rgba(0,0,0,0.25);
     border: 1px solid rgba(0,0,0,0.12);
   }
 
   .bmore-popup .leaflet-popup-tip {
-    background: var(--bg-main);
+    background: var(--bg-sand);
     border: 1px solid rgba(0,0,0,0.12);
   }
 
@@ -162,17 +151,17 @@
 
   .popup-inner {
     font-size: 0.9rem;
-    color: var(--ink-primary); 
+    color: var(--ink-dark); 
   }
 
   .popup-title {
     font-weight: 700;
     margin-bottom: 4px;
-    color: var(--ink-primary);
+    color: var(--ink-dark);
   }
 
   .popup-title a {
-    color: var(--ink-primary);
+    color: var(--ink-dark);
     text-decoration: none;
   }
 
@@ -282,7 +271,7 @@
 
 
 
-  .about-overlay {
+.about-overlay {
   position: fixed;
   inset: 0;                         /* top:0; right:0; bottom:0; left:0 */
   display: none;                    /* hidden by default */
@@ -306,24 +295,24 @@
   transform: translate(-50%, -50%);
   max-width: 520px;
   width: calc(100% - 40px);
-  background: var(--bg-main);
+  background: var(--bg-sand);
   border-radius: 10px;
   box-shadow: 0 12px 30px rgba(0,0,0,0.35);
   padding: 18px 20px 16px 20px;
-  border: 1px solid var(--bmore-brick);
+  border: 1px solid var(--ink-dark);
 }
 
 .about-panel h2 {
   margin: 0 0 0.5rem 0;
   font-size: 1.25rem;
-  color: var(--bmore-brick);
+  color: var(--ink-dark);
 }
 
 .about-panel p {
   margin: 0 0 0.5rem 0;
   font-size: 0.9rem;
   line-height: 1.45;
-  color: var(--bmore-brick);
+  color: var(--ink-dark);
 }
 
 .about-close {
@@ -362,7 +351,7 @@
 <body>
   <header>
     <div class="brand">
-      <img src="img/bmorebuild_logo.jpeg"  class="logo" alt="BmoreBuild logo" />
+      <img src="img/bmorebuild_logo.PNG"  class="logo" alt="BmoreBuild logo" />
     </div>
   
       <div class="header-right">
@@ -683,9 +672,9 @@
     .then(geo => {
       projectsUC = L.geoJSON(geo, {
         style: {
-          color: '#C44A2A',   // brick color for active builds
+          color: '#D6451A',   // brick color for active builds
           weight: 2,
-          fillOpacity: 0.4
+          fillOpacity: 0.55
         },
 
         onEachFeature: (feature, layer) => {
@@ -734,9 +723,9 @@
     .then(geo => {
       projects2025 = L.geoJSON(geo, {
         style: {
-          color: '#2F6F8F', 
+          color: '#3A6F91', 
           weight: 2,
-          fillOpacity: 0.3
+          fillOpacity: 0.55
         },
         onEachFeature: (feature, layer) => {
           const rec = bindProjectPopup(feature, layer);
