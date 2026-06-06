@@ -14,6 +14,7 @@ PARCEL_SDAT_COL      = "SDATLINK"           # link to SDAT detail page
 
 OUT_UNDER_CONSTRUCTION          = "data/UNDER_CONSTRUCTION.geojson"
 OUT_COMPLETED_2025    = "data/COMPLETED_2025.geojson"
+OUT_COMPLETED_2026    = "data/COMPLETED_2026.geojson"
 SIMPLIFY_TOL         = 0.00005              # tweak if polygons feel heavy
 # -----------------------------
 
@@ -82,6 +83,7 @@ def build_project_layer(merged: gpd.GeoDataFrame):
     Builds:
       - UNDER_CONSTRUCTION.geojson   (one feature per project_id)
       - COMPLETED_2025.geojson (one feature per project_id)
+      - COMPLETED_2026.geojson (one feature per project_id)
     """
        
     # Split into non-custom vs custom based on PIN suffix
@@ -143,18 +145,25 @@ def build_project_layer(merged: gpd.GeoDataFrame):
     #split into two publishable layers
     under_construction = gdf_combined[gdf_combined["project_status"] == "Under Construction"].copy()
     completed_2025 = gdf_combined[(gdf_combined["project_status"] == "Completed") & (gdf_combined["completed_year"].astype(str) == "2025")].copy()
+    completed_2026 = gdf_combined[(gdf_combined["project_status"] == "Completed") & (gdf_combined["completed_year"].astype(str) == "2026")].copy()
 
 
     print("Creating project geometry")
     print(f"    Under Construction:     {len(under_construction)} projects")
     print(f"    Completed 2025:         {len(completed_2025)} projects")
+    print(f"    Completed 2026:         {len(completed_2026)} projects")
+
 
 
     under_construction.to_file(OUT_UNDER_CONSTRUCTION, driver="GeoJSON")
     completed_2025.to_file(OUT_COMPLETED_2025, driver="GeoJSON")
+    completed_2026.to_file(OUT_COMPLETED_2026, driver="GeoJSON")
+
 
     print(f"Wrote {OUT_UNDER_CONSTRUCTION}")
     print(f"Wrote {OUT_COMPLETED_2025}")
+    print(f"Wrote {OUT_COMPLETED_2026}")
+
 
 
 
