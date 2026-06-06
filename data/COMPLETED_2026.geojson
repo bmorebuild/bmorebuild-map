@@ -1,0 +1,8 @@
+{
+"type": "FeatureCollection",
+"name": "COMPLETED_2026",
+"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+"features": [
+{ "type": "Feature", "properties": { "project_id": "PRJ-0030", "project_name": "1801 Guilford", "project_status": "Completed", "completed_year": "2026", "project_link": "https://thornhill.appfolio.com/listings/detail/12cdc232-b85a-43cc-ab25-83a98dda530e", "image_url": null }, "geometry": { "type": "Polygon", "coordinates": [ [ [ -76.612241025662144, 39.310061304033546 ], [ -76.612281662549236, 39.310683295508817 ], [ -76.612001916053032, 39.310692474940787 ], [ -76.611961212855022, 39.310070483143434 ], [ -76.612241025662144, 39.310061304033546 ] ] ] } }
+]
+}

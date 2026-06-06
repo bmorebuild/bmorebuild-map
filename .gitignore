@@ -12,6 +12,7 @@ data_local/
 *.zip
 *.geojson
 !data/COMPLETED_2025.geojson
+!data/COMPLETED_2026.geojson
 !data/UNDER_CONSTRUCTION.geojson
 
 # --- System/editor ---
