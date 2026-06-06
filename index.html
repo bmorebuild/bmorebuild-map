@@ -532,7 +532,7 @@
 
 
 
-  // --- PROJECT LAYERS: Under Construction + Completed 2025 ---
+  // --- PROJECT LAYERS: Under Construction + Completed Years ---
 
   let projectsUC = null;
   let projects2025 = null;
@@ -756,12 +756,12 @@
 
  
 
-    
+
   // Load COMPLETED_2026.geojson (overlay, off by default)
   fetch('data/COMPLETED_2026.geojson')
     .then(r => r.ok ? r.json() : Promise.reject(r.status))
     .then(geo => {
-      projects2026 = L.geoJSON(geo, {
+      projects2026 =L .geoJSON(geo, {
         style: {
           color: '#2b536d', 
           weight: 2,
@@ -782,7 +782,7 @@
       });
 
       // Add to layer control but don’t addTo(map) yet (user toggles it)
-      layerControl.addOverlay(projects2025, 'Completed (2026)');
+      layerControl.addOverlay(projects2026, 'Completed (2026)');
 
       setStatus('Loaded all project layers');
       setTimeout(() => { if (statusEl) statusEl.style.display = 'none'; }, 1000);
@@ -810,7 +810,7 @@
 
     function maybeBuildProjectList() {
       // wait until both layers are done
-      if (projectLayersLoaded < 2) return;
+      if (projectLayersLoaded < 3) return;
       buildProjectList();
     }
 
