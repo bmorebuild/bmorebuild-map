@@ -1,1 +1,5 @@
-![image](https://github.com/bmorebuild/bmorebuild-map/blob/main/img/bmorebuild_md_logo.png?raw=true)
+# Bmore Build
+
+Bmore Build is a static Leaflet map tracking selected construction and completed development projects in Baltimore.
+
+The public site is the primary project output.
