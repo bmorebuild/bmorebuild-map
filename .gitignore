@@ -14,7 +14,7 @@ data_local/
 !data/COMPLETED_2025.geojson
 !data/COMPLETED_2026.geojson
 !data/UNDER_CONSTRUCTION.geojson
-!documents/
+
 
 # --- System/editor ---
 .DS_Store
