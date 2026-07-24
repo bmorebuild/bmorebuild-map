@@ -5,6 +5,7 @@ __pycache__/
 
 # --- Local data (large or private) ---
 data_local/
+documents/
 *.gpkg
 *.shp
 *.dbf
