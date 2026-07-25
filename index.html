@@ -514,19 +514,11 @@
 
 
 
-
-
-
   // Layer control
   const layerControl = L.control.layers(baseLayers,
     {}, // overlays will be added
     { position: 'topleft', collapsed: true }
   ).addTo(map);
-
-
-
-
-
 
 
 
@@ -541,10 +533,9 @@
 
 
 
-
-
-
-
+  //----------------------------------------------------------------------
+  //Helper Functions -----------------------------------------------------
+  //----------------------------------------------------------------------
 
   // Helper: add hover highlight behavior to a polygon layer
   function attachHoverHighlight(layer) {
@@ -573,11 +564,27 @@
   }
 
 
+  // Helper: Created formated photo data
+  function formatPhotoDate(value) {
+    if (!value) return '';
+
+    const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value);
+
+    // If the value is not YYYY-MM-DD, display it unchanged.
+    if (!match) return value;
+
+    const [, year, month, day] = match;
+
+    // Construct the date using local year/month/day components.
+    const date = new Date(
+      Number(year),
+      Number(month) - 1,
+      Number(day)
+    );
 
 
-
-
-
+    return photoDateFormatter.format(date);
+  }
 
 
 
@@ -589,9 +596,12 @@
     const link   = p.project_link || '';
     const status = p.project_status || '';
     const year   = p.completed_year || '';
-    const imgUrl = p.image_url || '';   // we'll use this in a sec
+    const imgUrl = p.image_url || '';  
+    const photoDate = p.photo_date || '';
+
 
     let statusLine = '';
+
     if (status === 'Under Construction') {
       statusLine = 'Under construction';
     } else if (status === 'Completed' && year) {
@@ -606,6 +616,13 @@
       ? `<img src="${imgUrl}" class="popup-img" alt="${name}"/>`
       : '';
 
+    const photoDateHtml = photoDate
+      ? <div class= "popup-photo-date">
+        Photo taken: $(formatPhotoDate(photoDate))
+        </div>
+      :'';
+
+
     const titleHtml = link
       ? `<a href="${link}" target="_blank" rel="noopener noreferrer">${name}</a>`
       : name;
@@ -614,9 +631,37 @@
       <div class="popup-inner">
         <div class="popup-title">${titleHtml}</div>
         ${statusHtml}
+        ${photoDateHtml}
         ${imgHtml}
       </div>
     `;
+
+    const photoDateFormatter = new Intl.DateTimeFormat('en-US', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric'
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     layer.bindPopup(html, { className: 'bmore-popup' });
 
