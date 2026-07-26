@@ -104,7 +104,7 @@ def build_project_layer(merged: gpd.GeoDataFrame):
         "project_status": "first",
         "completed_year": "first",
         "project_link": "first",
-        "image_url":"first"
+        "image_url":"first",
         "photo_date":"first"
     }
 
@@ -121,7 +121,7 @@ def build_project_layer(merged: gpd.GeoDataFrame):
         "completed_year",
         "project_link",
         "image_url",
-        "photo_date":"first"
+        "photo_date"
     ]
 
     #Create non-custom geodataframe

@@ -564,30 +564,6 @@
   }
 
 
-  // Helper: Created formated photo data
-  function formatPhotoDate(value) {
-    if (!value) return '';
-
-    const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value);
-
-    // If the value is not YYYY-MM-DD, display it unchanged.
-    if (!match) return value;
-
-    const [, year, month, day] = match;
-
-    // Construct the date using local year/month/day components.
-    const date = new Date(
-      Number(year),
-      Number(month) - 1,
-      Number(day)
-    );
-
-
-    return photoDateFormatter.format(date);
-  }
-
-
-
   // Helper: bind popup using project_name + project_link
   function bindProjectPopup(feature, layer) {
     const p = feature.properties || {};
@@ -617,9 +593,9 @@
       : '';
 
     const photoDateHtml = photoDate
-      ? <div class= "popup-photo-date">
-        Photo taken: $(formatPhotoDate(photoDate))
-        </div>
+      ? `<div class= "popup-photo-date">
+        Photo taken: ${photoDate}
+        </div>`
       :'';
 
 
@@ -636,11 +612,6 @@
       </div>
     `;
 
-    const photoDateFormatter = new Intl.DateTimeFormat('en-US', {
-  year: 'numeric',
-  month: 'long',
-  day: 'numeric'
-});
 
 
 
