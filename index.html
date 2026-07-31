@@ -176,14 +176,8 @@
 
   .popup-img {
     display: block;
-    max-width: 100%;
-    max-height: min(360px, 45vh);
-
-    /* Preserve the original proportions */
-    width: auto;
+    width: 100%;
     height: auto;
-
-    /* Center portrait images */
     margin: 6px auto 0;
     border-radius: 6px;
   }
@@ -613,11 +607,14 @@
       </div>
     `;
 
+    const popupWidth = Math.min(450, window.innerWidth - 40);
+
+
     layer.bindPopup(html, { 
       className: 'bmore-popup',
-      minWidth: 220,
-      maxWidth: 340,
-      maxHeight: 520 });
+      minWidth: popupWidth,
+      maxWidth: popupWidth
+      });
 
 
     //Return normalized info (for table)
