@@ -144,8 +144,6 @@
   }
 
   .bmore-popup .leaflet-popup-content {
-    max-width: 1100px;
-    min-width: 400px;
     margin: 10px 12px;
   }
 
@@ -178,13 +176,20 @@
 
   .popup-img {
     display: block;
-    width: 100%;
-    max-width:1100px;
-    min-width: 400px;
+
+    /* Keep the image inside the popup */
+    max-width: 100%;
+
+    /* Keep tall portrait photos manageable */
+    max-height: min(360px, 45vh);
+
+    /* Preserve the original proportions */
+    width: auto;
     height: auto;
+
+    /* Center portrait images */
+    margin: 6px auto 0;
     border-radius: 6px;
-    object-fit: cover;
-    margin-top: 6px;
   }
   
 
@@ -561,7 +566,7 @@
     layer.on('mouseout', function () {
       layer.setStyle(originalStyle);
     });
-  }
+    }
 
 
   // Helper: bind popup using project_name + project_link
@@ -612,36 +617,16 @@
       </div>
     `;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    layer.bindPopup(html, { className: 'bmore-popup' });
+    layer.bindPopup(html, { 
+      className: 'bmore-popup',
+      minWidth: 220,
+      maxWidth: 340,
+      maxHeight: 520 });
 
 
     //Return normalized info (for table)
     return { name, status, year, link };
-
-
-  }
+    }
 
 
 
@@ -773,7 +758,10 @@
  
 
 
-  // Load COMPLETED_2026.geojson (overlay, off by default)
+
+
+
+    // Load COMPLETED_2026.geojson (overlay, off by default)
   fetch('data/COMPLETED_2026.geojson')
     .then(r => r.ok ? r.json() : Promise.reject(r.status))
     .then(geo => {
