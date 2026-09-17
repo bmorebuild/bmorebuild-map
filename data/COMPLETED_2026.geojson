@@ -3,6 +3,7 @@
 "name": "COMPLETED_2026",
 "crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
 "features": [
+{ "type": "Feature", "properties": { "project_id": "PRJ-0007", "project_name": "Rash Field Park Phase II", "project_status": "Completed", "completed_year": "2026", "project_link": "https://www.waterfrontpartnership.org/phase-ii-design-plans", "image_url": "img/projects/rash-field-07-19-2026.jpg", "photo_date": "07/19/2026" }, "geometry": { "type": "Polygon", "coordinates": [ [ [ -76.60759566892645, 39.280891108047143 ], [ -76.610607321148066, 39.280808824417385 ], [ -76.610659368021444, 39.281701623747146 ], [ -76.607652421297246, 39.281807974850395 ], [ -76.60759566892645, 39.280891108047143 ] ] ] } },
 { "type": "Feature", "properties": { "project_id": "PRJ-0030", "project_name": "1801 Guilford", "project_status": "Completed", "completed_year": "2026", "project_link": "https://thornhill.appfolio.com/listings/detail/12cdc232-b85a-43cc-ab25-83a98dda530e", "image_url": null, "photo_date": null }, "geometry": { "type": "Polygon", "coordinates": [ [ [ -76.612241025662144, 39.310061304033546 ], [ -76.612281662549236, 39.310683295508817 ], [ -76.612001916053032, 39.310692474940787 ], [ -76.611961212855022, 39.310070483143434 ], [ -76.612241025662144, 39.310061304033546 ] ] ] } }
 ]
 }
