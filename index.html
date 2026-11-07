@@ -321,6 +321,91 @@
 }
 
 
+.updates-panel {
+  position: absolute;
+
+  top: 160px;
+  right: 16px;
+
+  width: 400px;
+  max-height: calc(100% - 100px);
+
+  overflow-y: auto;
+
+  background: var(--bg-sand);
+
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  border-radius: 8px;
+
+  z-index: 800;
+
+  display: none;
+}
+
+.updates-panel.open {
+  display: block;
+}
+
+.updates-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 12px 16px;
+
+  border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+}
+
+.updates-panel-header h2 {
+  margin: 0;
+}
+
+#updates-list {
+  padding: 0 16px 16px;
+}
+
+
+
+.update-item {
+  padding: 16px 0;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+}
+
+.update-date {
+  font-size: 0.85rem;
+  color: #666;
+}
+
+.update-type {
+  margin-top: 4px;
+  font-size: 0.75rem;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+.update-project {
+  margin: 4px 0;
+}
+
+.update-description {
+  margin-top: 4px;
+}
+
+.update-image {
+  display: block;
+  width: 100%;
+  height: auto;
+
+  margin-top: 10px;
+
+  border-radius: 6px;
+}
+
+
+
+
+
+
   </style>
 </head>
 
@@ -355,6 +440,8 @@
 
         <button id="projects-btn" class="header-btn">Projects</button>
 
+        <button id="updates-btn" type="button">Updates</button>
+
         <div class="flags">
           <img src="img/Baltimore_Flag.svg" class="flag-icon" alt="Baltimore flag" />
         </div>
@@ -380,6 +467,7 @@
   </div>
 
 
+
   <div id="about-overlay" class="about-overlay">
     <div class="about-backdrop"></div>
       <div class="about-panel">
@@ -393,6 +481,24 @@
           
       </div>
   </div>
+
+
+
+
+
+  <div id="updates-panel" class="updates-panel open">
+    <div class="updates-panel-header">
+    <h2>Recent Updates</h2>
+
+    <button id="updates-panel-close" type="button" aria-label="Close recent updates">×</button>
+  </div>
+
+  <div id="updates-list">
+    Loading updates...
+  </div>
+
+
+
 
 
 
@@ -522,7 +628,7 @@
 
 
 
-  // --- PROJECT LAYERS: Under Construction + Completed Years ---
+  // PROJECT LAYERS: Under Construction & Completed Years
 
   let projectsUC = null;
   let projects2025 = null;
@@ -572,6 +678,7 @@
     const year   = p.completed_year || '';
     const imgUrl = p.image_url || '';  
     const photoDate = p.photo_date || '';
+    const projectId = p.project_id || '';
 
 
     let statusLine = '';
@@ -621,7 +728,7 @@
 
 
     //Return normalized info (for table)
-    return { name, status, year, link };
+    return { projectId, name, status, year, link };
     }
 
 
@@ -663,7 +770,7 @@
 
 
 
-  // Load UNDER_CONSTRUCTION.geojson (default visible)
+  // Load UNDER_CONSTRUCTION.geojson 
   setStatus('Loading under-construction projects…');
   fetch('data/UNDER_CONSTRUCTION.geojson')
     .then(r => r.ok ? r.json() : Promise.reject(r.status))
@@ -679,8 +786,9 @@
           const rec = bindProjectPopup(feature, layer);
           attachHoverHighlight(layer);
 
-          // store for table
+          // store for table and interactions
           projectRecords.push({
+            projectId: rec.projectId,
             name:   rec.name,
             status: rec.status,
             year:   rec.year,
@@ -689,22 +797,11 @@
         }
       }).addTo(map);
 
-
-
       projectLayersLoaded += 1;
       maybeBuildProjectList();
 
-
-
-      // Add to layer control as an overlay
+      // Add to layer control
       layerControl.addOverlay(projectsUC, 'Under construction');
-
-      // Set initial bounds for home button
-      const b = projectsUC.getBounds();
-      if (b && b.isValid && b.isValid()) {
-        map.fitBounds(b, { padding: [20, 20] });
-        window.bmorebuildInitialBounds = b;
-      }
 
       setStatus('Loaded under-construction projects');
     })
@@ -715,7 +812,7 @@
 
 
 
-  // Load COMPLETED_2025.geojson (overlay, off by default)
+  // Load COMPLETED_2025.geojson
   fetch('data/COMPLETED_2025.geojson')
     .then(r => r.ok ? r.json() : Promise.reject(r.status))
     .then(geo => {
@@ -729,17 +826,18 @@
           const rec = bindProjectPopup(feature, layer);
           attachHoverHighlight(layer);
 
-          // store for table
+          // store for table and interactions
           projectRecords.push({
+            projectId: rec.projectId,
             name:   rec.name,
             status: rec.status,
             year:   rec.year,
             layer:  layer
           });
         }
-      });
+      }).addTo(map);
 
-      // Add to layer control but don’t addTo(map) yet (user toggles it)
+      // Add to layer control
       layerControl.addOverlay(projects2025, 'Completed (2025)');
 
       setStatus('Loaded all project layers');
@@ -748,8 +846,7 @@
       projectLayersLoaded += 1;
       maybeBuildProjectList();
 
-    })
-    .catch(e => setStatus('Error loading COMPLETED_2025: ' + e));
+      });
 
  
 
@@ -757,11 +854,11 @@
 
 
 
-    // Load COMPLETED_2026.geojson (overlay, off by default)
+    // Load COMPLETED_2026.geojson
   fetch('data/COMPLETED_2026.geojson')
     .then(r => r.ok ? r.json() : Promise.reject(r.status))
     .then(geo => {
-      projects2026 =L .geoJSON(geo, {
+      projects2026 = L.geoJSON(geo, {
         style: {
           color: '#2b536d', 
           weight: 2,
@@ -771,17 +868,18 @@
           const rec = bindProjectPopup(feature, layer);
           attachHoverHighlight(layer);
 
-          // store for table
+          // store for table and interactions
           projectRecords.push({
+            projectId: rec.projectId,
             name:   rec.name,
             status: rec.status,
             year:   rec.year,
             layer:  layer
           });
         }
-      });
+      }).addTo(map);
 
-      // Add to layer control but don’t addTo(map) yet (user toggles it)
+      // Add to layer control
       layerControl.addOverlay(projects2026, 'Completed (2026)');
 
       setStatus('Loaded all project layers');
@@ -790,9 +888,7 @@
       projectLayersLoaded += 1;
       maybeBuildProjectList();
 
-    })
-    .catch(e => setStatus('Error loading COMPLETED_2026: ' + e));
-
+    });
        
 
 
@@ -809,10 +905,25 @@
 
 
     function maybeBuildProjectList() {
-      // wait until both layers are done
+      // Wait until all three project layers are loaded
       if (projectLayersLoaded < 3) return;
       buildProjectList();
+
+      const bounds = projectsUC.getBounds();
+
+      // Fit the initial map to all projects
+      if (bounds && bounds.isValid()) {
+
+        map.fitBounds(bounds, {
+          padding: [0, 0]
+        });
+
+        // Save these bounds for the Home button
+        window.bmorebuildInitialBounds = bounds;
+      }
     }
+
+
 
     function buildProjectList() {
       const listEl = document.getElementById('project-list');
@@ -872,7 +983,6 @@
 
 
 
-
     // Project panel open/close
     const projectsBtn   = document.getElementById('projects-btn');
     const projectPanel  = document.getElementById('project-panel');
@@ -880,6 +990,7 @@
 
     if (projectsBtn && projectPanel && projectClose) {
       projectsBtn.addEventListener('click', () => {
+        updatesPanel.classList.remove('open');
         projectPanel.classList.add('open');
       });
 
@@ -887,6 +998,25 @@
         projectPanel.classList.remove('open');
       });
     }
+
+
+    // Updates panel control
+    const updatesBtn = document.getElementById('updates-btn');
+    const updatesPanel = document.getElementById('updates-panel');
+    const updatesClose = document.getElementById('updates-panel-close');
+
+    if (updatesBtn && updatesPanel && updatesClose) {
+      updatesBtn.addEventListener('click', () => {
+        projectPanel.classList.remove('open');
+        updatesPanel.classList.add('open');
+      });
+
+      updatesClose.addEventListener('click', () => {
+        updatesPanel.classList.remove('open');
+      });
+    }
+
+
 
     // About overlay open/close
     const aboutBtn     = document.getElementById('about-btn');
@@ -908,8 +1038,192 @@
         backdrop.addEventListener('click', () => {
           aboutOverlay.classList.remove('open');
         });
-      }
+        }
     }
+
+
+
+
+
+    // Recent Updates Helper Functions
+  
+    function parseCSV(csvText) {
+
+      const lines = csvText
+        .trim()
+        .split('\n');
+
+      const headers = lines[0]
+        .split(',')
+        .map(header => header.trim());
+
+      return lines
+        .slice(1)
+        .filter(line => line.trim() !== '')
+        .map(line => {
+
+          const values = line
+            .split(',')
+            .map(value => value.trim());
+
+          const record = {};
+
+          headers.forEach((header, index) => {
+            record[header] = values[index] || '';
+          });
+
+          return record;
+        });
+    }
+
+
+    function getEventLabel(event) {
+
+      if (event.event_type === 'new_project') {
+        return 'New Project';
+      }
+
+      if (event.event_type === 'status_change') {
+        return 'Status Change';
+      }
+
+      if (event.event_type === 'image_added') {
+        return 'New Photo';
+      }
+
+      return 'Update';
+    }
+
+
+    function getEventDescription(event) {
+
+      if (event.event_type === 'new_project') {
+        return 'Added to BmoreBuild.';
+      }
+
+      if (event.event_type === 'status_change') {
+        return `${event.old_value} → ${event.new_value}`;
+      }
+
+      if (event.event_type === 'image_added') {
+        return 'New project photo added.';
+      }
+
+      return '';
+    }
+
+
+
+    
+    // HTML element where updates will appear
+    const updatesList = document.getElementById('updates-list');
+
+    // Load and render updates
+    fetch('data/project_events.csv')
+      .then(response => {
+
+        if (!response.ok) {
+          throw new Error(
+            `HTTP error ${response.status}`
+          );
+        }
+
+        return response.text();
+
+      })
+      .then(csvText => {
+
+        const events = parseCSV(csvText);
+
+
+        events.sort((a, b) => {return new Date(b.event_date) - new Date(a.event_date);
+        });
+
+
+        updatesList.innerHTML = '';
+
+        for (const event of events) {
+
+          const article = document.createElement('article');
+
+          article.className = 'update-item';
+
+
+          const date = document.createElement('div');
+
+          date.className = 'update-date';
+          date.textContent = event.event_date;
+
+
+          const type = document.createElement('div');
+
+          type.className = 'update-type';
+          type.textContent = getEventLabel(event);
+
+
+          const title = document.createElement('h3');
+
+          title.className = 'update-project';
+          title.textContent = event.project_name;
+
+
+          const description = document.createElement('div');
+
+          description.className = 'update-description';
+
+          description.textContent = getEventDescription(event);
+
+          article.appendChild(date);
+          article.appendChild(type);
+          article.appendChild(title);
+          article.appendChild(description);
+
+
+          if (event.image_url) {
+            const image = document.createElement('img');
+
+            image.src = event.image_url;
+            image.alt =`${event.project_name} project photo`;
+            image.className ='update-image';
+
+            article.appendChild(image);
+          }
+
+          // click: find project, zoom + popup
+          article.addEventListener('click', () => {
+
+            const rec = projectRecords.find(
+              p => p.projectId === event.project_id
+            );
+
+            if (!rec) return;
+
+            updatesPanel.classList.remove('open');
+
+            if (rec.layer && rec.layer.getBounds) {
+              const b = rec.layer.getBounds();
+              if (b && b.isValid && b.isValid()) {
+                map.fitBounds(b, { padding: [20, 20] });
+              }
+            }
+
+            if (rec.layer && rec.layer.openPopup) {
+              rec.layer.openPopup();
+            }
+
+          });
+
+
+
+
+
+          updatesList.appendChild(article);
+        }
+        console.log(events);
+      }).catch(error => {console.error(error);
+
+    });
+
 
 
 
