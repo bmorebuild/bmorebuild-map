@@ -5,19 +5,17 @@
   <title>bmorebuild</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  
+  
+  
+  <link rel="icon" type="image/png" href="img/favicon12.png">
+  
   <style>
     :root {
-      --bg-sand:    #FFFAE3; 
+      --bg-sand:    #F4E9D8; 
       --ink-dark:   #38210B;  
       --brick-main: #C23E11;  
-
-
     }
-
-
-
-
-
 
     html, body {
       height: 100%;
@@ -183,46 +181,6 @@
   }
   
 
-  .project-panel {
-  position: absolute;
-  top: 140px;              /* below header */
-  right: 20px;
-  width: 300px;
-  bottom: 16px;           /* stop above the bottom of the viewport */
-
-  background: #FFF9E6; /* your sand tone */
-  border-radius: 8px;
-  box-shadow: 0 4px 14px rgba(0,0,0,0.25);
-  border: 1px solid rgba(0,0,0,0.15);
-  
-  z-index: 1500;
-  overflow: hidden;
-
-  display: none;          /* hidden by default */
-  flex-direction: column;
-  }
-
-  .project-panel.open {
-    display: flex;
-  }
-
-  .project-panel-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 6px 10px;
-    border-bottom: 1px solid rgba(0,0,0,0.1);
-    background: rgba(255,255,255,0.8);
-  }
-
-  .project-panel-header span {
-    font-size: 0.85rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: var(--ink-dark);
-  }
-
   .panel-close {
     border: none;
     background: transparent;
@@ -252,161 +210,317 @@
     background: rgba(0,0,0,0.04);
   }
 
-  .project-item-title {
+  .project-item-title,
+  .update-project {
     font-size: 0.9rem;
-    font-weight: 500;
-    margin-bottom: 2px;
+    font-weight: 600;
+    color: var(--ink-dark);
   }
 
-  .project-item-meta {
-    font-size: 0.75rem;
+  .project-item-meta,
+  .update-date,
+  .update-description {
+    font-size: 0.76rem;
     color: #6a5b50;
   }
 
 
+  
+  .updates-panel {
+    position: absolute;
+
+    top: 160px;
+    right: 16px;
+
+    width: 400px;
+    max-height: calc(100% - 100px);
+
+    overflow-y: auto;
+
+    background: var(--bg-sand);
+
+    border: 1px solid rgba(0, 0, 0, 0.15);
+    border-radius: 8px;
+
+    z-index: 800;
+
+    display: none;
+  }
 
 
-.about-overlay {
-  position: fixed;
-  inset: 0;                         /* top:0; right:0; bottom:0; left:0 */
-  display: none;                    /* hidden by default */
-  z-index: 2000;                    /* above map & project panel */
-}
+  #updates-list {
+    padding: 0 16px 16px;
+  }
 
-.about-overlay.open {
-  display: block;
-}
+  .update-item {
+    padding: 16px 0;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+  }
 
-.about-backdrop {
-  position: absolute;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.35);  /* semi-transparent dark */
-}
+  .update-project {
+    margin: 4px 0 2px;
+  }
 
-.about-panel {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  max-width: 520px;
-  width: calc(100% - 40px);
-  background: var(--bg-sand);
-  border-radius: 10px;
-  box-shadow: 0 12px 30px rgba(0,0,0,0.35);
-  padding: 18px 20px 16px 20px;
-  border: 1px solid var(--ink-dark);
-}
+  .update-date {
+    margin: 0;
+  }
 
-.about-panel h2 {
-  margin: 0 0 0.5rem 0;
-  font-size: 1.25rem;
-  color: var(--ink-dark);
-}
+  .update-description {
+    margin-top: 4px;
+    line-height: 1.35;
+  }
 
-.about-panel p {
-  margin: 0 0 0.5rem 0;
-  font-size: 0.9rem;
-  line-height: 1.45;
-  color: var(--ink-dark);
-}
+  .update-type {
+    margin-top: 4px;
+    font-size: 0.76rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--bmore-brick, #A34D2E);
+  }
 
-.about-close {
-  position: absolute;
-  top: 6px;
-  right: 8px;
-  border: none;
-  background: transparent;
-  font-size: 1.2rem;
-  cursor: pointer;
-}
-
-
-.updates-panel {
-  position: absolute;
-
-  top: 160px;
-  right: 16px;
-
-  width: 400px;
-  max-height: calc(100% - 100px);
-
-  overflow-y: auto;
-
-  background: var(--bg-sand);
-
-  border: 1px solid rgba(0, 0, 0, 0.15);
-  border-radius: 8px;
-
-  z-index: 800;
-
-  display: none;
-}
-
-.updates-panel.open {
-  display: block;
-}
-
-.updates-panel-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-
-  padding: 12px 16px;
-
-  border-bottom: 1px solid rgba(0, 0, 0, 0.12);
-}
-
-.updates-panel-header h2 {
-  margin: 0;
-}
-
-#updates-list {
-  padding: 0 16px 16px;
-}
-
-
-
-.update-item {
-  padding: 16px 0;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.12);
-}
-
-.update-date {
-  font-size: 0.85rem;
-  color: #666;
-}
-
-.update-type {
-  margin-top: 4px;
-  font-size: 0.75rem;
-  font-weight: bold;
-  text-transform: uppercase;
-}
-
-.update-project {
-  margin: 4px 0;
-}
-
-.update-description {
-  margin-top: 4px;
-}
-
-.update-image {
-  display: block;
-  width: 100%;
-  height: auto;
-
-  margin-top: 10px;
-
-  border-radius: 6px;
-}
+  .update-image {
+    display: block;
+    width: 100%;
+    height: auto;
+    margin-top: 10px;
+    border-radius: 6px;
+  }
 
 
 
 
+  .browse-panel {
+    display: none;
 
+    position: absolute;
+    top: 110px;
+    right: 20px;
+
+    width: 420px;
+    max-height: calc(100% - 140px);
+
+    background: var(--bmore-sand, #F4E9D8);
+
+    border: 1px solid rgba(0, 0, 0, 0.12);
+    border-radius: 12px;
+
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+
+    overflow: hidden;
+    z-index: 800;
+  }
+
+  .browse-panel.open {
+    display: block;
+  }
+
+  .browse-panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 0 14px;
+
+    border-bottom: 1px solid rgba(0, 0, 0, 0.10);
+  }
+
+  .browse-tabs {
+    display: flex;
+    gap: 4px;
+  }
+
+  .browse-tab {
+    appearance: none;
+
+    border: 0;
+    border-bottom: 3px solid transparent;
+
+    background: transparent;
+
+    padding: 14px 12px 11px;
+
+    font: inherit;
+    font-size: 0.95rem;
+    font-weight: 600;
+
+    color: rgba(0, 0, 0, 0.60);
+
+    cursor: pointer;
+  }
+
+
+  .browse-tab:hover {
+    color: #222;
+    background: rgba(255, 255, 255, 0.25);
+  }
+
+
+  .browse-tab.active {
+    color: var(--bmore-brick, #A34D2E);
+    border-bottom-color: var(--bmore-brick, #A34D2E);
+  } 
+    
+
+  .browse-view {
+    display: none;
+
+    max-height: calc(100vh - 210px);
+    overflow-y: auto;
+  }
+
+  .browse-view.active {
+    display: block;
+  }
+
+
+  .panel-close {
+    appearance: none;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 34px;
+    height: 34px;
+
+    border: none;
+    border-radius: 50%;
+
+    background: transparent;
+
+    font-size: 1.4rem;
+    line-height: 1;
+
+    color: rgba(0, 0, 0, 0.55);
+
+    cursor: pointer;
+  }
+
+  .panel-close:hover {
+    background: rgba(0, 0, 0, 0.07);
+    color: #111;
+  }
+
+
+
+
+  .nav-button {
+    appearance: none;
+
+    border: 1px solid rgba(0, 0, 0, 0.12);
+    border-radius: 999px;
+
+    background: rgba(255, 255, 255, 0.78);
+
+    padding: 8px 16px;
+
+    font: inherit;
+    font-size: 0.92rem;
+    font-weight: 600;
+
+    color: #333;
+
+    cursor: pointer;
+
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+
+    transition:
+      background 0.15s ease,
+      border-color 0.15s ease,
+      box-shadow 0.15s ease,
+      transform 0.15s ease;
+  }
+
+  .nav-button:hover {
+    background: #fff;
+
+    border-color:
+      rgba(163, 77, 46, 0.45);
+
+    box-shadow:
+      0 4px 10px rgba(0, 0, 0, 0.12);
+
+    transform: translateY(-1px);
+  }
+
+  .nav-button:active {
+    transform: translateY(0);
+
+    box-shadow:
+      0 2px 4px rgba(0, 0, 0, 0.10);
+  }
+
+  .nav-button:focus-visible {
+    outline:
+      3px solid rgba(163, 77, 46, 0.30);
+
+    outline-offset: 2px;
+  }
+
+
+
+  .about-overlay {
+    position: fixed;
+    inset: 0;                         /* top:0; right:0; bottom:0; left:0 */
+    display: none;                    /* hidden by default */
+    z-index: 2000;                    /* above map & project panel */
+  }
+
+  .about-overlay.open {
+    display: block;
+  }
+
+  .about-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.35);  /* semi-transparent dark */
+  }
+
+  .about-panel {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    max-width: 520px;
+    width: calc(100% - 40px);
+    background: var(--bg-sand);
+    border-radius: 10px;
+    box-shadow: 0 12px 30px rgba(0,0,0,0.35);
+    padding: 18px 20px 16px 20px;
+    border: 1px solid var(--ink-dark);
+  }
+
+  .about-panel h2 {
+    margin: 0 0 0.5rem 0;
+    font-size: 1.25rem;
+    color: var(--ink-dark);
+  }
+
+  .about-panel p {
+    margin: 0 0 0.5rem 0;
+    font-size: 0.9rem;
+    line-height: 1.45;
+    color: var(--ink-dark);
+  }
+
+  .about-close {
+    position: absolute;
+    top: 6px;
+    right: 8px;
+    border: none;
+    background: transparent;
+    font-size: 1.2rem;
+    cursor: pointer;
+  }
 
   </style>
+
+
+
+
+
+
 </head>
 
 
@@ -434,17 +548,15 @@
       <img src="img/bmorebuild_logo.PNG"  class="logo" alt="BmoreBuild logo" />
     </div>
   
-      <div class="header-right">
+    <div class="header-right">
 
-        <button id="about-btn" class="header-btn">About</button>
+      <button id="about-btn" class="nav-button" type="button">About</button>
 
-        <button id="projects-btn" class="header-btn">Projects</button>
+      <button id="browse-btn" class="nav-button" type="button">Browse</button>
 
-        <button id="updates-btn" type="button">Updates</button>
-
-        <div class="flags">
-          <img src="img/Baltimore_Flag.svg" class="flag-icon" alt="Baltimore flag" />
-        </div>
+      <div class="flags">
+        <img src="img/Baltimore_Flag.svg" class="flag-icon" alt="Baltimore flag" />
+      </div>
     </div>
   </header>
 
@@ -455,16 +567,66 @@
 
 
 
-  <div id="project-panel" class="project-panel">
-    <div class="project-panel-header">
-      <span>Projects</span>
-      <button id="project-panel-close" class="panel-close" aria-label="Close projects list">×</button>
+
+
+  //new stuff
+  <div id="browse-panel" class="browse-panel">
+
+    <div class="browse-panel-header">
+
+      <div class="browse-tabs">
+        <button
+          id="projects-tab"
+          class="browse-tab active"
+          type="button">
+          Projects
+        </button>
+
+        <button
+          id="updates-tab"
+          class="browse-tab"
+          type="button">
+          Updates
+        </button>
+
+      </div>
+
+      <button
+        id="browse-panel-close"
+        class="panel-close"
+        type="button"
+        aria-label="Close panel">
+        ×
+      </button>
     </div>
 
-    <div class="project-panel-body">
-      <ul id="project-list" class="project-list"></ul>
+
+    <div
+      id="projects-view"
+      class="browse-view active">
+
+      <div class="project-panel-body">
+        <ul
+          id="project-list"
+          class="project-list">
+        </ul>
+      </div>
     </div>
+
+
+    <div
+      id="updates-view"
+      class="browse-view">
+
+      <div id="updates-list">
+        Loading updates...
+      </div>
+    </div>
+
   </div>
+
+
+
 
 
 
@@ -486,17 +648,7 @@
 
 
 
-  <div id="updates-panel" class="updates-panel open">
-    <div class="updates-panel-header">
-    <h2>Recent Updates</h2>
-
-    <button id="updates-panel-close" type="button" aria-label="Close recent updates">×</button>
-  </div>
-
-  <div id="updates-list">
-    Loading updates...
-  </div>
-
+  
 
 
 
@@ -966,6 +1118,9 @@
 
         // click: zoom + popup
         li.addEventListener('click', () => {
+          
+          browsePanel.classList.remove('open');
+          
           if (rec.layer && rec.layer.getBounds) {
             const b = rec.layer.getBounds();
             if (b && b.isValid && b.isValid()) {
@@ -982,39 +1137,67 @@
     }
 
 
+    // Shared Projects / Updates panel controls
 
-    // Project panel open/close
-    const projectsBtn   = document.getElementById('projects-btn');
-    const projectPanel  = document.getElementById('project-panel');
-    const projectClose  = document.getElementById('project-panel-close');
 
-    if (projectsBtn && projectPanel && projectClose) {
-      projectsBtn.addEventListener('click', () => {
-        updatesPanel.classList.remove('open');
-        projectPanel.classList.add('open');
-      });
+    const browsePanel = document.getElementById('browse-panel');
+    const browseClose = document.getElementById('browse-panel-close');
 
-      projectClose.addEventListener('click', () => {
-        projectPanel.classList.remove('open');
-      });
+    const browseBtn = document.getElementById('browse-btn');
+
+    const projectsTab = document.getElementById('projects-tab');
+    const updatesTab = document.getElementById('updates-tab');
+
+    const projectsView = document.getElementById('projects-view');
+    const updatesView = document.getElementById('updates-view');
+
+
+    function showBrowseTab(tabName) {
+      const showProjects =
+        tabName === 'projects';
+
+      projectsView.classList.toggle(
+        'active',
+        showProjects
+      );
+
+      updatesView.classList.toggle(
+        'active',
+        !showProjects
+      );
+
+      projectsTab.classList.toggle(
+        'active',
+        showProjects
+      );
+
+      updatesTab.classList.toggle(
+        'active',
+        !showProjects
+      );
     }
 
 
-    // Updates panel control
-    const updatesBtn = document.getElementById('updates-btn');
-    const updatesPanel = document.getElementById('updates-panel');
-    const updatesClose = document.getElementById('updates-panel-close');
+   
+    browseBtn.addEventListener('click', () => {
+      browsePanel.classList.add('open');
+      showBrowseTab('updates');
+    });
 
-    if (updatesBtn && updatesPanel && updatesClose) {
-      updatesBtn.addEventListener('click', () => {
-        projectPanel.classList.remove('open');
-        updatesPanel.classList.add('open');
-      });
+    projectsTab.addEventListener('click', () => {
+      showBrowseTab('projects');
+    });
 
-      updatesClose.addEventListener('click', () => {
-        updatesPanel.classList.remove('open');
-      });
-    }
+
+    updatesTab.addEventListener('click', () => {
+      showBrowseTab('updates');
+    });
+
+
+    browseClose.addEventListener('click', () => {
+      browsePanel.classList.remove('open');
+    });
+
 
 
 
@@ -1198,12 +1381,15 @@
 
             if (!rec) return;
 
-            updatesPanel.classList.remove('open');
+            browsePanel.classList.remove('open');
 
             if (rec.layer && rec.layer.getBounds) {
               const b = rec.layer.getBounds();
+
               if (b && b.isValid && b.isValid()) {
-                map.fitBounds(b, { padding: [20, 20] });
+                map.fitBounds(b, {
+                  padding: [20, 20]
+                });
               }
             }
 
