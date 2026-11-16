@@ -92,21 +92,6 @@
       min-height: 0;
     }
 
-    @media (max-width: 600px) {
-      header .title-text span.tagline {
-        display: none;
-      }
-      header img.logo {
-        height: 70px;
-      }
-      
-      header img.flag-icon { 
-        height: 70px;          
-      }
-
-      header {
-      padding: 0.35rem 0.7rem; /* tighter top bar */
-    }}
 
     .leaflet-control-home {
       background: #fff;
@@ -255,6 +240,11 @@
   .update-item {
     padding: 16px 0;
     border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+    cursor:pointer;
+  }
+
+  .update-item:hover {
+    background: rgba(0,0,0,0.04);
   }
 
   .update-project {
@@ -294,10 +284,10 @@
     display: none;
 
     position: absolute;
-    top: 110px;
+    top: 155px;
     right: 20px;
 
-    width: 420px;
+    width: 470px;
     max-height: calc(100% - 140px);
 
     background: var(--bmore-sand, #F4E9D8);
@@ -458,6 +448,38 @@
     outline-offset: 2px;
   }
 
+
+
+
+  @media (max-width: 600px) {
+      header .title-text span.tagline {
+        display: none;
+      }
+      header img.logo {
+        height: 70px;
+      }
+      
+      header img.flag-icon { 
+        height: 70px;          
+      }
+
+      header {
+      padding: 0.35rem 0.7rem; /* tighter top bar */
+      }
+  
+      .browse-panel {
+      left: 12px;
+      right: 12px;
+
+      width: auto;
+      max-width: none;
+
+      top: 120px;
+      bottom: 12px;
+
+      box-sizing: border-box;
+      }
+    }
 
 
   .about-overlay {
