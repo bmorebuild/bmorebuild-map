@@ -4,3 +4,4 @@ event_date,project_id,project_name,event_type,old_value,new_value,image_url
 09/19/2026,PRJ-0009,Locke Landing,image_added,,,img/projects/Locke-Landing-09-19-2026.jpeg
 09/19/2026,PRJ-0039,The Paramount Baltimorem,image_added,,,img/projects/The-Paramount-Baltimore-09-19-2026.jpeg
 09/18/2026,PRJ-0040,M&T Bank Stadium North Plaza,status_change,Under Construction,Completed,
+08/31/2026,PRJ-0012,JHU SNF Agora Building,status_change,Under Construction,Completed,img/projects/JHU-SNF-Agora-07-26-2026.jpg
