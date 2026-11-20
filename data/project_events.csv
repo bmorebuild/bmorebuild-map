@@ -1,4 +1,6 @@
 event_date,project_id,project_name,event_type,old_value,new_value,image_url
+11/20/2026,PRJ-0039,The Paramount Baltimore,status_change,Under Construction,Completed,img/projects/The-Paramount-Baltimore-09-19-2026.jpeg
+11/20/2026,PRJ-0001,Commodore John Rodgers School,image_added,,,img/proects/Commodore-John-Rodgers-11-20-2026.jpg
 11/19/2026,PRJ-0026,4 Martin Luther King Jr Blvd,image_added,,,img/projects/4-Martin-Luther-King-Jr-Blvd-11-19-2026.jpg
 11/07/2026,PRJ-0014,JHU Early Learning Center,status_change,Under Construction,Completed,
 09/19/2026,PRJ-0008,The Frank,image_added,,,img/projects/The-Frank-09-19-2026.jpeg
