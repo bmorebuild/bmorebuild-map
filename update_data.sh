@@ -11,8 +11,9 @@ echo "🔹 Rebuilding GeoJSON layers..."
 python scripts/build_layers.py
 
 echo "🔹 Staging updated data..."
-git add data/*.geojson
+git add data/
 git add img/projects/
+git add index.html
 timestamp=$(date +"%Y-%m-%d %H:%M")
 git commit -m "Data update: $timestamp"
 
